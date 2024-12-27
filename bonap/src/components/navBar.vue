@@ -7,14 +7,16 @@
                 </router-link>
             </div>
             <div class="nav-bar__links">
-                <router-link to="/">Accueil</router-link>
                 <div v-if="isLoggedIn" class="dropdown">
                     <button class="dropbtn" @click="toggleDropdown">Mon Compte</button>
                     <div :class="{'dropdown-content': true, 'show': dropdownOpen}">
                         <router-link to="/profile">Profil</router-link>
-                        <router-link to="/orders">Mes Commandes</router-link>
+                        <router-link v-if="userRole === 'client'" to="/orders">Mes Commandes</router-link>
                         <router-link v-if="userRole === 'admin'" to="/admin/dashboard">Tableau de Bord</router-link>
                         <router-link v-if="userRole === 'admin'" to="/admin/users">Gérer les Utilisateurs</router-link>
+                        <router-link v-if="userRole === 'restaurateur'" to="/restaurateur/dashboard">Tableau de Bord Restaurateur</router-link>
+                        <router-link v-if="userRole === 'livreur'" to="/livreur/orders">Commandes en Cours</router-link>
+                        <router-link to="/logout">Déconnexion</router-link>
                     </div>
                 </div>
                 <div v-else>
@@ -30,18 +32,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-// Simuler l'état de connexion de l'utilisateur
-const isLoggedIn = ref(true);
-const userRole = ref('admin'); // Peut être 'admin', 'client', etc.
+// Simuler l'état de connexion et le rôle de l'utilisateur
+const isLoggedIn = ref(false); // Changez cette valeur pour tester
+const userRole = ref('guest'); // Changez cette valeur pour tester ('client', 'admin', 'restaurateur', 'livreur')
+
 const dropdownOpen = ref(false);
 
-// Fonction pour basculer l'affichage du menu déroulant
 const toggleDropdown = () => {
     dropdownOpen.value = !dropdownOpen.value;
 };
-
-// Vous pouvez remplacer la logique ci-dessus par une vérification réelle de l'état de connexion
-// et du rôle de l'utilisateur, par exemple, en vérifiant un token dans le localStorage ou en utilisant un store Vuex.
 </script>
 
 <style scoped>
@@ -49,8 +48,9 @@ const toggleDropdown = () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #333;
     padding: 1rem;
+    background-color: #333;
+    color: white;
 }
 
 .nav-bar__logo img {
@@ -59,12 +59,13 @@ const toggleDropdown = () => {
 
 .nav-bar__links {
     display: flex;
-    gap: 1rem;
+    align-items: center;
 }
 
 .nav-bar__links a {
     color: white;
     text-decoration: none;
+    margin: 0 10px;
 }
 
 .dropdown {
@@ -75,8 +76,6 @@ const toggleDropdown = () => {
 .dropbtn {
     background-color: #333;
     color: white;
-    padding: 1rem;
-    font-size: 16px;
     border: none;
     cursor: pointer;
 }

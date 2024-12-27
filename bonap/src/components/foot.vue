@@ -53,4 +53,13 @@
         color: white;
         text-decoration: none;
     }
+
+    footer {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 1rem;
+        position: relative;
+        bottom: 0;
+}
 </style>
