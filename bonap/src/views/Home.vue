@@ -1,6 +1,6 @@
 <template>
     <main>
-        <heroSearch />
+        <heroSearch @search-results="updateRestaurants" />
         <carroussel @filter-cuisine="filterCuisine" />
         <section>
             <div class="grid-container">
@@ -21,37 +21,53 @@ import itemRestaurant from '@/components/itemRestaurant.vue';
 const restaurants = ref([]);
 const filteredRestaurants = ref([]);
 
-// Fonction pour récupérer tous les restaurants depuis l'api
+// Fonction pour récupérer tous les restaurants depuis l'API
 const fetchRestaurants = async () => {
     try {
-        const response = await fetch('http://localhost:8080/api/restaurants');
+        const response = await fetch('http://localhost:8080/api/restaurants', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        const data = await response.json(); // récupère les données dans la variable data sous forme de JSON (tableau associatif)
-restaurants.value = data;                   // assigne les données récupérées à la variable restaurants
-filteredRestaurants.value = data;           // initialise les restaurants filtrés avec les mêmes données
+        const data = await response.json();
+        restaurants.value = data;
+        filteredRestaurants.value = data;
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
     }
 };
 
+// Fonction pour filtrer les restaurants par type de cuisine
 const filterCuisine = async (typeCuisineId) => {
-                // Si l'ID du type de cuisine est null, réinitialiser les restaurants filtrés avec tous les restaurants
     if (typeCuisineId === null) {
-        filteredRestaurants.value = restaurants.value; 
-        return; // et sortir de la fonction
+        filteredRestaurants.value = restaurants.value;
+        return;
     }
     try {
-        const response = await fetch(`http://localhost:8080/api/restaurants/filter?typeCuisineId=${typeCuisineId}`);
+        const response = await fetch(`http://localhost:8080/api/restaurants/filter?typeCuisineId=${typeCuisineId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         if (!response.ok) {
             throw new Error('Network response was not ok');
-        }       // récupère les données des resturants dont le type de cuisine est celui défini
+        }
         const data = await response.json();
         filteredRestaurants.value = data;
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
     }
+};
+
+// Fonction pour mettre à jour les restaurants avec les résultats de la recherche
+const updateRestaurants = (restaurants) => {
+    console.log('updateRestaurants called with:', restaurants); // Log pour vérifier que la fonction est appelée
+    filteredRestaurants.value = restaurants;
 };
 
 onMounted(async () => {
@@ -63,19 +79,19 @@ onMounted(async () => {
 .grid-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: space-around;
+    gap: 1rem; /* Espace entre les éléments */
+    justify-content: space-around; /* Centrer les éléments */
 }
 
 @media (max-width: 768px) {
     .grid-container > * {
-        flex: 1 1 calc(50% - 1rem);
+        flex: 1 1 calc(50% - 1rem); /* Deux colonnes sur les écrans moyens */
     }
 }
 
 @media (max-width: 480px) {
     .grid-container > * {
-        flex: 1 1 100%;
+        flex: 1 1 100%; /* Une colonne sur les petits écrans */
     }
 }
 </style>

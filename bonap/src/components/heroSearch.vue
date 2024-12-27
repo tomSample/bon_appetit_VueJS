@@ -2,7 +2,7 @@
     <div class="hero-search">
         <h1>Bienvenue sur Bon Appétit !</h1>
         <div class="search-container">
-            <input type="text" placeholder="Rechercher un restaurant par ville..." v-model="searchQuery" @input="onSearch" />
+            <input type="text" placeholder="Rechercher un restaurant par ville..." v-model="searchQuery" />
             <button @click="onSearch">Rechercher</button>
         </div>
         <h2>Le bon resto au bon endroit</h2>
@@ -10,13 +10,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, defineEmits } from 'vue';
 
 const searchQuery = ref('');
+const emit = defineEmits(['search-results']);
 
-const onSearch = () => {
-    // Affiche le message saisi dans la console
-    console.log('Recherche:', searchQuery.value);
+const onSearch = async () => {
+    console.log('onSearch called with query:', searchQuery.value); // Log pour vérifier que la fonction est appelée
+    try {
+        const response = await fetch(`http://localhost:8080/api/restaurants/filterByVille?villeNom=${searchQuery.value}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log('Restaurants trouvés:', data); // Log pour vérifier les données reçues
+        emit('search-results', data); // Émet l'événement avec les résultats de la recherche
+        console.log('search-results event emitted'); // Log pour vérifier que l'événement est émis
+    } catch (error) {
+        console.error('Erreur lors de la recherche des restaurants:', error);
+    }
 };
 </script>
 
