@@ -21,7 +21,7 @@ import itemRestaurant from '@/components/itemRestaurant.vue';
 const restaurants = ref([]);
 const filteredRestaurants = ref([]);
 
-// Fonction pour récupérer tous les restaurants depuis l'API
+// Function to fetch all restaurants from the API
 const fetchRestaurants = async () => {
     try {
         const response = await fetch('http://localhost:8080/api/restaurants', {
@@ -41,7 +41,7 @@ const fetchRestaurants = async () => {
     }
 };
 
-// Fonction pour filtrer les restaurants par type de cuisine
+// Function to filter restaurants by cuisine type
 const filterCuisine = async (typeCuisineId) => {
     if (typeCuisineId === null) {
         filteredRestaurants.value = restaurants.value;
@@ -64,9 +64,9 @@ const filterCuisine = async (typeCuisineId) => {
     }
 };
 
-// Fonction pour mettre à jour les restaurants avec les résultats de la recherche
+// Function to update the restaurants with the search results
 const updateRestaurants = (restaurants) => {
-    console.log('updateRestaurants called with:', restaurants); // Log pour vérifier que la fonction est appelée
+    console.log('updateRestaurants called with:', restaurants); // Log to verify the function is called
     filteredRestaurants.value = restaurants;
 };
 
@@ -79,19 +79,19 @@ onMounted(async () => {
 .grid-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem; /* Espace entre les éléments */
-    justify-content: space-around; /* Centrer les éléments */
+    gap: 1rem; /* Space between items */
+    justify-content: space-around; /* Center items */
 }
 
 @media (max-width: 768px) {
     .grid-container > * {
-        flex: 1 1 calc(50% - 1rem); /* Deux colonnes sur les écrans moyens */
+        flex: 1 1 calc(50% - 1rem); /* Two columns on medium screens */
     }
 }
 
 @media (max-width: 480px) {
     .grid-container > * {
-        flex: 1 1 100%; /* Une colonne sur les petits écrans */
+        flex: 1 1 100%; /* One column on small screens */
     }
 }
 </style>
