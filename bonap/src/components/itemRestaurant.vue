@@ -11,7 +11,10 @@
 <script setup lang="ts">
 import { defineProps } from 'vue';
 
+// Définition des propriétés (props) que le composant attend de son parent
 const props = defineProps({
+    // Propriété 'restaurant' est de type Objet car provient de la bdd
+    // (à l'inverse, on pourrait rentrer des données en dur)
     restaurant: {
         type: Object,
         required: true
@@ -24,8 +27,8 @@ const props = defineProps({
     border: 1px solid #ccc;
     padding: 1rem;
     margin: 1rem 0;
-    width: 220px; /* Taille fixe pour le conteneur */
-    height: 300px; /* Taille fixe pour le conteneur */
+    width: 220px;
+    height: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -36,8 +39,8 @@ const props = defineProps({
 .restaurant-item img {
     width: 100%;
     height: auto;
-    max-height: 150px; /* Limite la hauteur de l'image */
-    object-fit: cover; /* Ajuste l'image pour couvrir l'espace disponible */
+    max-height: 150px;
+    object-fit: cover;
 }
 
 .restaurant-item h2, .restaurant-item p {

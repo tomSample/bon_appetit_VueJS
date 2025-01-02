@@ -2,9 +2,17 @@
 <template>
     <div v-if="restaurant">
         <!-- Afficher le nom et la description du restaurant -->
+        <img :src="restaurant.photo" alt="Photo du restaurant" />
         <h2>{{ restaurant.nom }}</h2>
         <p>{{ restaurant.description }}</p>
         <p>Ceci est la page du restaurant qui doit afficher les plats proposés</p>
+
+        <!-- Afficher le formulaire de réservation -->
+        <reservationForm />
+
+        <!-- Afficher les plats proposés par le restaurant -->
+        <itemProduitByType />
+
     </div>
     <div v-else>
         <p>Loading...</p>
@@ -15,7 +23,8 @@
 <script setup lang="ts">
 // Import des composants (ref = reactive)
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
+import reservationForm from '@/components/reservationForm.vue';
 
 const route = useRoute();
 const restaurantId = route.params.id;
