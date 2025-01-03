@@ -32,7 +32,7 @@ const isError = ref(false);
 // Method to submit the login form
 const submitLogin = async () => {
     try {
-        const response = await fetch('http://localhost:8080/api/connexions', {
+        const response = await fetch('http://localhost:8080/api/connexions/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
