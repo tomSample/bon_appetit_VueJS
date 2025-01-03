@@ -8,7 +8,7 @@
             </div>
             <div class="form-group">
                 <label for="password">Mot de passe :</label>
-                <input type="password" id="password" v-model="loginData.motDePasse" required />
+                <input type="password" id="password" v-model="loginData.password" required />
             </div>
             <button type="submit">Se connecter</button>
         </form>
@@ -22,7 +22,7 @@ import { ref } from 'vue';
 // Define the login data object with default values
 const loginData = ref({
     login: '',
-    motDePasse: ''
+    password: ''
 });
 
 // Message to display the login status
