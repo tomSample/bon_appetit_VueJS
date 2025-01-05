@@ -1,53 +1,103 @@
 <template>
     <div class="signup-container">
-        <h2>Inscription</h2>
+        <h2>Sign Up</h2>
         <form @submit.prevent="submitSignUp">
             <div>
-                <label for="username">Nom d'utilisateur:</label>
-                <input type="text" id="username" v-model="signUpData.username" required />
+                <label for="login">Login:</label>
+                <input type="text" id="login" v-model="signUpData.login" required />
             </div>
             <div>
-                <label for="password">Mot de passe:</label>
+                <label for="password">Password:</label>
                 <input type="password" id="password" v-model="signUpData.password" required />
             </div>
-            <button type="submit">S'inscrire</button>
+            <div>
+                <label for="nom">Last Name:</label>
+                <input type="text" id="nom" v-model="signUpData.nom" required />
+            </div>
+            <div>
+                <label for="prenom">First Name:</label>
+                <input type="text" id="prenom" v-model="signUpData.prenom" required />
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" v-model="signUpData.email" required />
+            </div>
+            <div>
+                <label for="telephone">Phone:</label>
+                <input type="text" id="telephone" v-model="signUpData.telephone" required />
+            </div>
+            <input type="hidden" v-model="signUpData.role_id" />
+            <input type="hidden" v-model="signUpData.connexion_id" />
+            <button type="submit">Sign Up</button>
         </form>
         <p v-if="message">{{ message }}</p>
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const signUpData = ref({
-    username: '',
-    password: ''
+    login: '',
+    password: '',
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    role_id: 2, // Default role ID
+    connexion_id: null // This will be set after creating the connexion
 });
 
 const message = ref('');
+const router = useRouter();
 
 const submitSignUp = async () => {
     try {
-        // Submit new user data
-        const response = await fetch('http://localhost:8080/api/connexions', {
+        // Step 1: Submit new user data to Connexion table
+        const connexionResponse = await fetch('http://localhost:8080/api/connexions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                login: signUpData.value.username,
+                login: signUpData.value.login,
                 password: signUpData.value.password
             })
         });
 
-        if (!response.ok) {
-            if (response.status === 409) {
+        if (!connexionResponse.ok) {
+            if (connexionResponse.status === 409) {
                 throw new Error('Nom d\'utilisateur indisponible.');
             }
-            throw new Error('Erreur lors de l\'inscription.');
+            throw new Error('Erreur lors de la création de la connexion.');
         }
 
-        message.value = 'Inscription réussie !';
+        const connexionData = await connexionResponse.json();
+        signUpData.value.connexion_id = connexionData.id; // Set the connexion_id from the response
+
+        // Step 2: Submit new user data to Utilisateur table
+        const utilisateurResponse = await fetch('http://localhost:8080/api/utilisateurs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nom: signUpData.value.nom,
+                prenom: signUpData.value.prenom,
+                email: signUpData.value.email,
+                telephone: signUpData.value.telephone,
+                role: { id: signUpData.value.role_id }, // Include the Role object
+                connexion: { id: signUpData.value.connexion_id } // Include the Connexion object
+            })
+        });
+
+        if (!utilisateurResponse.ok) {
+            throw new Error('Erreur lors de la création de l\'utilisateur.');
+        }
+
+        message.value = 'Inscription réussie!';
+        router.push('/'); // Redirect to the homepage
     } catch (error) {
         message.value = error.message || 'Erreur lors de l\'inscription.';
     }
