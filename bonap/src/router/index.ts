@@ -7,6 +7,7 @@ import Mentions from '../views/Mentions.vue'
 import CondGe from '@/views/ConditionsGenerales.vue'
 import About from '@/views/About.vue'
 import ResetCo from '@/views/ResetCo.vue'
+import Checkout from '@/views/Checkout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +51,11 @@ const router = createRouter({
       path: '/reset-co',
       name: 'reset-co',
       component: ResetCo,
+    },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: Checkout,
     }
   ],
 });

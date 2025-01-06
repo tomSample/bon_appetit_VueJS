@@ -23,7 +23,7 @@
                     <router-link to="/signup">Inscription</router-link>
                     <router-link to="/login">Connexion</router-link>
                 </div>
-                <router-link to="/cart">Panier</router-link>
+                <button @click="$emit('toggle-cart')">Panier</button>
             </div>
         </nav>
     </header>
