@@ -12,6 +12,9 @@
             </div>
             <button type="submit">Se connecter</button>
         </form>
+        <p>
+            <router-link to="/reset-co">Mot de passe oublié ?</router-link>
+        </p>
         <div v-if="message" :class="{'message': true, 'error': isError}">{{ message }}</div>
     </div>
 </template>

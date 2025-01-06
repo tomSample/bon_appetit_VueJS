@@ -45,8 +45,8 @@ const signUpData = ref({
     prenom: '',
     email: '',
     telephone: '',
-    role_id: 2, // Default role ID
-    connexion_id: null // This will be set after creating the connexion
+    role_id: 2, // role client par défaut
+    connexion_id: null // sera récupérée par la suite (plus bas)
 });
 
 const message = ref('');
@@ -54,7 +54,7 @@ const router = useRouter();
 
 const submitSignUp = async () => {
     try {
-        // Step 1: Submit new user data to Connexion table
+        // Etape 1: envoyer les données à la table Connexion
         const connexionResponse = await fetch('http://localhost:8080/api/connexions', {
             method: 'POST',
             headers: {
@@ -74,9 +74,10 @@ const submitSignUp = async () => {
         }
 
         const connexionData = await connexionResponse.json();
-        signUpData.value.connexion_id = connexionData.id; // Set the connexion_id from the response
+        signUpData.value.connexion_id = connexionData.id; // Récupérer valeur de connexion_id
 
-        // Step 2: Submit new user data to Utilisateur table
+        // 
+        // Etape 2: envoyer les données à la table Utilisateur
         const utilisateurResponse = await fetch('http://localhost:8080/api/utilisateurs', {
             method: 'POST',
             headers: {
@@ -87,8 +88,8 @@ const submitSignUp = async () => {
                 prenom: signUpData.value.prenom,
                 email: signUpData.value.email,
                 telephone: signUpData.value.telephone,
-                role: { id: signUpData.value.role_id }, // Include the Role object
-                connexion: { id: signUpData.value.connexion_id } // Include the Connexion object
+                role: { id: signUpData.value.role_id }, // Inclure Role (objet) =>  '{' '}'
+                connexion: { id: signUpData.value.connexion_id } // Inclure Connexion (objet) =>  '{' '}'
             })
         });
 
@@ -96,8 +97,10 @@ const submitSignUp = async () => {
             throw new Error('Erreur lors de la création de l\'utilisateur.');
         }
 
-        message.value = 'Inscription réussie!';
-        router.push('/'); // Redirect to the homepage
+        
+        router.push('/');
+        message.value = 'Inscription réussie!'; // n'apparait pas => à revoir
+
     } catch (error) {
         message.value = error.message || 'Erreur lors de l\'inscription.';
     }

@@ -5,17 +5,21 @@
             <p>Admin Panel</p>
             <nav>
                 <ul>
-                    <li><a href="/admin/dashboard">Dashboard</a></li>
-                    <li><a href="/admin/settings">Settings</a></li>
+                    <li><router-link to="/admin/dashboard">Dashboard</router-link></li>
+                    <li><router-link to="/admin/settings">Settings</router-link></li>
+                    <li><router-link to="/mentions">Mentions légales</router-link></li>
+                    <li><router-link to="/conditions-generales">Conditions Générales</router-link></li>
+                    <li><router-link to="/about">A propos</router-link></li>
                 </ul>
             </nav>
         </div>
-        <div v-else-if="userRole === 'user'">
-            <p>User Panel</p>
+        <div v-else-if="userRole === 'guest'">
+            <p>Guest Panel</p>
             <nav>
                 <ul>
-                    <li><a href="/profile">Profile</a></li>
-                    <li><a href="/settings">Settings</a></li>
+                    <li><router-link to="/mentions">Mentions légales</router-link></li>
+                    <li><router-link to="/conditions-generales">Conditions Générales</router-link></li>
+                    <li><router-link to="/about">A propos</router-link></li>
                 </ul>
             </nav>
         </div>
@@ -28,7 +32,7 @@
 <script setup lang="ts">
     import { ref } from 'vue';
 
-    const userRole = ref('admin'); // Change this value to 'admin' or 'user' to test different roles
+    const userRole = ref('guest'); // Change this value to 'admin' or 'user' to test different roles
 </script>
 
 <style scoped>
