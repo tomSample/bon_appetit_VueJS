@@ -9,6 +9,7 @@ import About from '@/views/About.vue'
 import ResetCo from '@/views/ResetCo.vue'
 import Checkout from '@/views/Checkout.vue'
 import OwnerCreate from '@/views/OwnerCreate.vue'
+import OwnerDashboard from '@/views/OwnerDashboard.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -62,6 +63,11 @@ const router = createRouter({
       path: '/owner/create',
       name: 'owner-create',
       component: OwnerCreate,
+    },
+    {
+      path: '/owner/dashboard',
+      name: 'owner-dashboard',
+      component: OwnerDashboard,
     }
   ],
 });
