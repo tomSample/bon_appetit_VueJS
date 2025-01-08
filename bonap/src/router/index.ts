@@ -8,6 +8,7 @@ import CondGe from '@/views/ConditionsGenerales.vue'
 import About from '@/views/About.vue'
 import ResetCo from '@/views/ResetCo.vue'
 import Checkout from '@/views/Checkout.vue'
+import OwnerCreate from '@/views/OwnerCreate.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,6 +57,11 @@ const router = createRouter({
       path: '/checkout',
       name: 'checkout',
       component: Checkout,
+    },
+    {
+      path: '/owner/create',
+      name: 'owner-create',
+      component: OwnerCreate,
     }
   ],
 });

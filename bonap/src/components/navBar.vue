@@ -14,7 +14,8 @@
                         <router-link v-if="userRole === 'client'" to="/orders">Mes Commandes</router-link>
                         <router-link v-if="userRole === 'admin'" to="/admin/dashboard">Tableau de Bord</router-link>
                         <router-link v-if="userRole === 'admin'" to="/admin/users">Gérer les Utilisateurs</router-link>
-                        <router-link v-if="userRole === 'restaurateur'" to="/restaurateur/dashboard">Tableau de Bord Restaurateur</router-link>
+                        <router-link v-if="userRole === 'owner'" to="/owner/dashboard">Tableau de Bord owner</router-link>
+                        <router-link v-if="userRole === 'owner'" to="/owner/create">Créer un restaurant</router-link>
                         <router-link v-if="userRole === 'livreur'" to="/livreur/orders">Commandes en Cours</router-link>
                         <router-link to="/logout">Déconnexion</router-link>
                     </div>
@@ -33,8 +34,8 @@
 import { ref } from 'vue';
 
 // Simuler l'état de connexion et le rôle de l'utilisateur
-const isLoggedIn = ref(false); // Changez cette valeur pour tester
-const userRole = ref('guest'); // Changez cette valeur pour tester ('client', 'admin', 'restaurateur', 'livreur')
+const isLoggedIn = ref(true); // Changez cette valeur pour tester
+const userRole = ref('owner'); // Changez cette valeur pour tester ('client', 'admin', 'owner', 'livreur')
 
 const dropdownOpen = ref(false);
 

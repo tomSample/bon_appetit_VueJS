@@ -13,7 +13,7 @@
                 </ul>
             </nav>
         </div>
-        <div v-else-if="userRole === 'guest'">
+        <div v-else-if="userRole === 'owner'">
             <p>Guest Panel</p>
             <nav>
                 <ul>
@@ -24,7 +24,14 @@
             </nav>
         </div>
         <div v-else>
-            <p>Welcome, Guest!</p>
+            <p>Guest Panel</p>
+            <nav>
+                <ul>
+                    <li><router-link to="/mentions">Mentions légales</router-link></li>
+                    <li><router-link to="/conditions-generales">Conditions Générales</router-link></li>
+                    <li><router-link to="/about">A propos</router-link></li>
+                </ul>
+            </nav>    
         </div>
     </footer>
 </template>
