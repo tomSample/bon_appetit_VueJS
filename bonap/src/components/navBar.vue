@@ -10,8 +10,7 @@
                 <div v-if="isLoggedIn" class="dropdown">
                     <button class="dropbtn" @click="toggleDropdown">Mon Compte</button>
                     <div :class="{'dropdown-content': true, 'show': dropdownOpen}">
-                        <router-link to="/profile">Profil</router-link>
-                        <router-link v-if="userRole === 'client'" to="/orders">Mes Commandes</router-link>
+                        <router-link v-if="userRole === 'client'" to="/my-account">Mon Profil</router-link>
                         <router-link v-if="userRole === 'admin'" to="/admin/dashboard">Tableau de Bord</router-link>
                         <router-link v-if="userRole === 'admin'" to="/admin/users">Gérer les Utilisateurs</router-link>
                         <router-link v-if="userRole === 'owner'" to="/owner/dashboard">Tableau de Bord owner</router-link>
@@ -35,7 +34,7 @@ import { ref } from 'vue';
 
 // Simuler l'état de connexion et le rôle de l'utilisateur
 const isLoggedIn = ref(true); // Changez cette valeur pour tester
-const userRole = ref('owner'); // Changez cette valeur pour tester ('client', 'admin', 'owner', 'livreur')
+const userRole = ref('client'); // Changez cette valeur pour tester ('client', 'admin', 'owner', 'livreur')
 
 const dropdownOpen = ref(false);
 
