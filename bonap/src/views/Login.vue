@@ -54,7 +54,8 @@ const submitLogin = async () => {
         }
 
         const data = await response.json();
-        console.log('Token:', data.token); // Debugging line
+        // Debug (valeur de userId, role, login, iat, exp) => iat = 'token émis à' (issued at) et exp = 'token expire à' (expires at). La valeur de iat et exp représentent une heure.
+        console.log('Token:', data.token); 
         await authStore.login(data.token);
         message.value = 'Connexion réussie';
         isError.value = false;

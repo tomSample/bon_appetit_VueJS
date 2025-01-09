@@ -15,7 +15,7 @@
                         <router-link v-if="userRole === 'admin'" to="/admin/users">Gérer les Utilisateurs</router-link>
                         <router-link v-if="userRole === 'owner'" to="/owner/dashboard">Tableau de Bord owner</router-link>
                         <router-link v-if="userRole === 'owner'" to="/owner/create">Créer un restaurant</router-link>
-                        <router-link v-if="userRole === 'livreur'" to="/livreur/orders">Commandes en Cours</router-link>
+                        <router-link v-if="userRole === 'carrier'" to="/carrier/orders">Commandes en Cours</router-link>
                         <router-link to="#" @click.prevent="logout">Déconnexion</router-link>
                     </div>
                 </div>
