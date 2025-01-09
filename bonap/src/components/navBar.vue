@@ -16,7 +16,7 @@
                         <router-link v-if="userRole === 'owner'" to="/owner/dashboard">Tableau de Bord owner</router-link>
                         <router-link v-if="userRole === 'owner'" to="/owner/create">Créer un restaurant</router-link>
                         <router-link v-if="userRole === 'livreur'" to="/livreur/orders">Commandes en Cours</router-link>
-                        <router-link to="/logout">Déconnexion</router-link>
+                        <router-link to="#" @click.prevent="logout">Déconnexion</router-link>
                     </div>
                 </div>
                 <div v-else>
@@ -30,17 +30,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
 
-// Simuler l'état de connexion et le rôle de l'utilisateur
-const isLoggedIn = ref(true); // Changez cette valeur pour tester
-const userRole = ref('client'); // Changez cette valeur pour tester ('client', 'admin', 'owner', 'livreur')
+const authStore = useAuthStore();
 
 const dropdownOpen = ref(false);
 
 const toggleDropdown = () => {
     dropdownOpen.value = !dropdownOpen.value;
 };
+
+const logout = () => {
+    authStore.logout();
+    window.location.reload(); // Rafraîchir la page après la déconnexion
+};
+
+const isLoggedIn = computed(() => authStore.isLoggedIn);
+const userRole = computed(() => authStore.userRole);
 </script>
 
 <style scoped>

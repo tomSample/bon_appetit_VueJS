@@ -21,41 +21,48 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
-// Define the login data object with default values
+const authStore = useAuthStore();
+const router = useRouter();
+
 const loginData = ref({
     login: '',
     password: ''
 });
 
-// Message to display the login status
 const message = ref('');
 const isError = ref(false);
 
-// Method to submit the login form
 const submitLogin = async () => {
     try {
-        const response = await fetch('http://localhost:8080/api/connexions/login', {
+        const response = await fetch('http://localhost:8080/api/connexions/check', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify(loginData.value)
+            body: JSON.stringify({
+                login: loginData.value.login,
+                password: loginData.value.password,
+            }),
         });
+
         if (!response.ok) {
-            if (response.status === 403) {
-                throw new Error('Login ou mot de passe incorrect.');
-            }
-            throw new Error('Network response was not ok');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Login failed');
         }
+
         const data = await response.json();
-        message.value = 'Connexion réussie !';
+        console.log('Token:', data.token); // Debugging line
+        await authStore.login(data.token);
+        message.value = 'Connexion réussie';
         isError.value = false;
-        console.log('Connexion réussie:', data);
+        router.push('/'); // Rediriger vers la page d'accueil ou une autre page après la connexion réussie
+
     } catch (error) {
-        message.value = error.message || 'Erreur lors de la connexion.';
+        message.value = error.message || 'Erreur de connexion';
         isError.value = true;
-        console.error('Error during login:', error);
     }
 };
 </script>
@@ -66,50 +73,47 @@ const submitLogin = async () => {
     margin: 0 auto;
     padding: 1rem;
     border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+    border-radius: 4px;
 }
 
 .form-group {
     margin-bottom: 1rem;
 }
 
-label {
+.form-group label {
     display: block;
     margin-bottom: 0.5rem;
 }
 
-input {
+.form-group input {
     width: 100%;
     padding: 0.5rem;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
 button {
     width: 100%;
     padding: 0.75rem;
+    background-color: #007bff;
+    color: #fff;
     border: none;
-    border-radius: 5px;
-    background-color: #333;
-    color: white;
+    border-radius: 4px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #555;
+    background-color: #0056b3;
 }
 
 .message {
     margin-top: 1rem;
-    padding: 0.5rem;
-    border-radius: 5px;
-    background-color: #e0ffe0;
-    color: #006600;
+    padding: 0.75rem;
+    border-radius: 4px;
 }
 
 .error {
-    background-color: #ffe0e0;
-    color: #660000;
+    background-color: #f8d7da;
+    color: #721c24;
 }
 </style>
