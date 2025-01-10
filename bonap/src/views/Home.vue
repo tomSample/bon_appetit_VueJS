@@ -60,7 +60,7 @@ const filterCuisine = async (typeCuisineId) => {
         return;
     }
     try {
-        const response = await fetch(`http://localhost:8080/api/restaurants/filter?typeCuisineId=${typeCuisineId}`, {
+        const response = await fetch(`http://localhost:8080/api/restaurants/filterByCuisine?typeCuisineId=${typeCuisineId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

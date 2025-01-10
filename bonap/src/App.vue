@@ -16,7 +16,12 @@ const toggleCart = () => {
 const isLoggedIn = computed(() => authStore.isLoggedIn);
 const userRole = computed(() => authStore.userRole);
 
-console.log(isLoggedIn.value, userRole.value);
+// debug
+
+console.log('isLoggedIn :', isLoggedIn.value);
+console.log('userRole :', userRole.value);
+console.log('token:', authStore.token)
+
 </script>
 
 <template>

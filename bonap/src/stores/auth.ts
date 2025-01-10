@@ -26,8 +26,12 @@ export const useAuthStore = defineStore('auth', {
             this.token = token; // Met à jour le token dans l'état
             this.isLoggedIn = true; // Met à jour l'état de connexion
             localStorage.setItem('token', this.token); // Stocke le token dans le localStorage
-            const decodedToken: DecodedToken = JSON.parse(atob(this.token.split('.')[1])); // Décode le token JWT
+            const decodedToken: DecodedToken = JSON.parse(atob(this.token.split('.')[1])); // atob => Décode le token JWT (!=btoa => encoder un string) 
+
+            //debug
+            console.log('Token:', token);
             console.log('Decoded Token:', decodedToken); // Ligne de débogage pour afficher le token décodé
+
             if (decodedToken.userId) {
                 await this.fetchUserRole(decodedToken.userId); // Récupère le rôle de l'utilisateur si l'ID est présent dans le token
             } else {
@@ -54,11 +58,12 @@ export const useAuthStore = defineStore('auth', {
         },
         // Action pour gérer la déconnexion (bouton déconnexion de la navBar)
         logout() {
-            this.token = ''; // Réinitialise le token dans l'état
-            this.userRole = ''; // Réinitialise le rôle de l'utilisateur dans l'état
-            this.isLoggedIn = false; // Met à jour l'état de connexion
-            localStorage.removeItem('token'); // Supprime le token du localStorage
-            localStorage.removeItem('userRole'); // Supprime le rôle de l'utilisateur du localStorage
+            // this.token = ''; // Réinitialise le token dans l'état
+            // this.userRole = ''; // Réinitialise le rôle de l'utilisateur dans l'état
+            // this.isLoggedIn = false; // Met à jour l'état de connexion
+            // localStorage.removeItem('token'); // Supprime le token du localStorage
+            // localStorage.removeItem('userRole'); // Supprime le rôle de l'utilisateur du localStorage
+            localStorage.clear(); // résume les lignes précédentes
         },
     },
 });
