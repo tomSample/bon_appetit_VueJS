@@ -22,7 +22,8 @@
             <!-- ===parts=== -->
             <RestaurantTable v-if="activeTab === 'restaurant'" />
             <ClientTable v-if="activeTab === 'client'" />
-            <!-- Repeat similar structure for other tabs (dashboard, report) -->
+            <ChartTable v-if="activeTab === 'dashboard'" />
+            <!-- Repeat similar structure for other tabs (report) -->
         </div>
     </div>
 </template>
@@ -31,6 +32,7 @@
 import { ref } from 'vue';
 import RestaurantTable from '@/components/RestaurantTable.vue';
 import ClientTable from '@/components/ClientTable.vue';
+import ChartTable from '@/components/ChartTable.vue'; // Assurez-vous que ce chemin est correct
 
 // Définir l'onglet actif par défaut comme 'restaurant'
 const activeTab = ref('restaurant');
