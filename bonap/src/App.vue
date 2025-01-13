@@ -1,19 +1,32 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { RouterView } from 'vue-router';
 import navBar from '@/components/navBar.vue';
 import foot from '@/components/foot.vue';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
 
 const isCartVisible = ref(false);
 
 const toggleCart = () => {
   isCartVisible.value = !isCartVisible.value;
 };
+
+const isLoggedIn = computed(() => authStore.isLoggedIn);
+const userRole = computed(() => authStore.userRole);
+
+// debug
+
+console.log('isLoggedIn :', isLoggedIn.value);
+console.log('userRole :', userRole.value);
+console.log('token:', authStore.token)
+
 </script>
 
 <template>
   <header>
-    <navBar @toggle-cart="toggleCart" />
+    <navBar @toggle-cart="toggleCart" :isLoggedIn="isLoggedIn" :userRole="userRole" />
   </header>
 
   <main>

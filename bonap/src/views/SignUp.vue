@@ -35,8 +35,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
 const signUpData = ref({
     login: '',
@@ -45,12 +45,18 @@ const signUpData = ref({
     prenom: '',
     email: '',
     telephone: '',
-    role_id: 2, // role client par défaut
+    role_id: null,
     connexion_id: null // sera récupérée par la suite (plus bas)
 });
 
 const message = ref('');
 const router = useRouter();
+const route = useRoute();
+
+onMounted(() => {
+    // Récupérer le rôle à partir des métadonnées de la route
+    signUpData.value.role_id = route.meta.role;
+});
 
 const submitSignUp = async () => {
     try {
@@ -76,7 +82,6 @@ const submitSignUp = async () => {
         const connexionData = await connexionResponse.json();
         signUpData.value.connexion_id = connexionData.id; // Récupérer valeur de connexion_id
 
-        // 
         // Etape 2: envoyer les données à la table Utilisateur
         const utilisateurResponse = await fetch('http://localhost:8080/api/utilisateurs', {
             method: 'POST',
@@ -88,8 +93,8 @@ const submitSignUp = async () => {
                 prenom: signUpData.value.prenom,
                 email: signUpData.value.email,
                 telephone: signUpData.value.telephone,
-                role: { id: signUpData.value.role_id }, // Inclure Role (objet) =>  '{' '}'
-                connexion: { id: signUpData.value.connexion_id } // Inclure Connexion (objet) =>  '{' '}'
+                role: { id: signUpData.value.role_id }, // Inclure Role (objet)
+                connexion: { id: signUpData.value.connexion_id } // Inclure Connexion (objet)
             })
         });
 
@@ -97,7 +102,6 @@ const submitSignUp = async () => {
             throw new Error('Erreur lors de la création de l\'utilisateur.');
         }
 
-        
         router.push('/');
         message.value = 'Inscription réussie!'; // n'apparait pas => à revoir
 
@@ -108,45 +112,45 @@ const submitSignUp = async () => {
 </script>
 
 <style scoped>
-    .signup-container {
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 1em;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
+.signup-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
 
-    .signup-container h2 {
-        text-align: center;
-    }
+.signup-container h2 {
+    text-align: center;
+}
 
-    .signup-container form {
-        display: flex;
-        flex-direction: column;
-    }
+.signup-container form {
+    display: flex;
+    flex-direction: column;
+}
 
-    .signup-container form div {
-        margin-bottom: 1em;
-    }
+.signup-container form div {
+    margin-bottom: 1em;
+}
 
-    .signup-container form label {
-        margin-bottom: 0.5em;
-        font-weight: bold;
-    }
+.signup-container form label {
+    margin-bottom: 0.5em;
+    font-weight: bold;
+}
 
-    .signup-container form input {
-        padding: 0.5em;
-        font-size: 1em;
-    }
+.signup-container form input {
+    padding: 0.5em;
+    font-size: 1em;
+}
 
-    .signup-container form button {
-        padding: 0.5em;
-        font-size: 1em;
-        cursor: pointer;
-    }
+.signup-container form button {
+    padding: 0.5em;
+    font-size: 1em;
+    cursor: pointer;
+}
 
-    .signup-container p {
-        text-align: center;
-        color: red;
-    }
+.signup-container p {
+    text-align: center;
+    color: red;
+}
 </style>

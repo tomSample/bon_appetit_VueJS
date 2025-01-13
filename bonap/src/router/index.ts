@@ -9,6 +9,8 @@ import About from '@/views/About.vue'
 import ResetCo from '@/views/ResetCo.vue'
 import Checkout from '@/views/Checkout.vue'
 import OwnerCreate from '@/views/OwnerCreate.vue'
+import OwnerDashboard from '@/views/OwnerDashboard.vue'
+import MyAccount from '@/views/MyAccount.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,10 +25,25 @@ const router = createRouter({
       name: 'restaurant',
       component: Restaurant,
     },
+
+    //attribuer un role par le path
     {
-      path: '/signup',
-      name: 'signup',
+      path: '/signup/client',
+      name: 'signup-client',
       component: SignUp,
+      meta: { role : 2 },
+    },
+    {
+      path: '/signup/owner',
+      name: 'signup-owner',
+      component: SignUp,
+      meta: { role : 3 },
+    },
+    {
+      path: '/signup/carrier',
+      name: 'signup-carrier',
+      component: SignUp,
+      meta: { role : 4 },
     },
     {
       path: '/login',
@@ -62,6 +79,16 @@ const router = createRouter({
       path: '/owner/create',
       name: 'owner-create',
       component: OwnerCreate,
+    },
+    {
+      path: '/owner/dashboard',
+      name: 'owner-dashboard',
+      component: OwnerDashboard,
+    },
+    {
+      path: '/my-account',
+      name: 'my-account',
+      component: MyAccount,
     }
   ],
 });
