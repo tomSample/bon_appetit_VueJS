@@ -25,10 +25,25 @@ const router = createRouter({
       name: 'restaurant',
       component: Restaurant,
     },
+
+    //attribuer un role par le path
     {
-      path: '/signup',
-      name: 'signup',
+      path: '/signup/client',
+      name: 'signup-client',
       component: SignUp,
+      meta: { role : 2 },
+    },
+    {
+      path: '/signup/owner',
+      name: 'signup-owner',
+      component: SignUp,
+      meta: { role : 3 },
+    },
+    {
+      path: '/signup/carrier',
+      name: 'signup-carrier',
+      component: SignUp,
+      meta: { role : 4 },
     },
     {
       path: '/login',

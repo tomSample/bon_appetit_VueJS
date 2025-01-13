@@ -20,7 +20,7 @@
                     </div>
                 </div>
                 <div v-else>
-                    <router-link to="/signup">Inscription</router-link>
+                    <router-link to="/signup/client">Inscription</router-link>
                     <router-link to="/login">Connexion</router-link>
                 </div>
                 <button @click="$emit('toggle-cart')">Panier</button>
