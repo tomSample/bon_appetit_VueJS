@@ -37,7 +37,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
+// Définir les données d'inscription
 const signUpData = ref({
     login: '',
     password: '',
@@ -46,21 +48,53 @@ const signUpData = ref({
     email: '',
     telephone: '',
     role_id: null,
-    connexion_id: null // sera récupérée par la suite (plus bas)
+    connexion_id: null
 });
 
 const message = ref('');
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
+// Récupérer le rôle à partir des métadonnées de la route lors du montage du composant
 onMounted(() => {
-    // Récupérer le rôle à partir des métadonnées de la route
     signUpData.value.role_id = route.meta.role;
 });
 
+// Fonction pour connecter l'utilisateur
+const loginUser = async (login, password) => {
+    try {
+        const response = await fetch('http://localhost:8080/api/connexions/check', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ login, password }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Login failed');
+        }
+
+        const data = await response.json();
+        await authStore.login(data.token);
+        message.value = 'Connexion réussie';
+        router.push('/'); // Rediriger vers la page d'accueil après la connexion réussie
+    } catch (error) {
+        message.value = error.message || 'Erreur de connexion';
+    }
+};
+
+// Fonction pour soumettre les données d'inscription
 const submitSignUp = async () => {
     try {
-        // Etape 1: envoyer les données à la table Connexion
+        // Vérifier si les champs utilisateur sont complets
+        if (!signUpData.value.nom || !signUpData.value.prenom || !signUpData.value.email || !signUpData.value.telephone) {
+            throw new Error('Veuillez remplir tous les champs utilisateur.');
+        }
+
+        // Étape 1: envoyer les données à la table Connexion
         const connexionResponse = await fetch('http://localhost:8080/api/connexions', {
             method: 'POST',
             headers: {
@@ -80,9 +114,9 @@ const submitSignUp = async () => {
         }
 
         const connexionData = await connexionResponse.json();
-        signUpData.value.connexion_id = connexionData.id; // Récupérer valeur de connexion_id
+        signUpData.value.connexion_id = connexionData.id; // Récupérer la valeur de connexion_id
 
-        // Etape 2: envoyer les données à la table Utilisateur
+        // Étape 2: envoyer les données à la table Utilisateur
         const utilisateurResponse = await fetch('http://localhost:8080/api/utilisateurs', {
             method: 'POST',
             headers: {
@@ -99,11 +133,15 @@ const submitSignUp = async () => {
         });
 
         if (!utilisateurResponse.ok) {
+            // Supprimer la connexion créée si l'inscription échoue
+            await fetch(`http://localhost:8080/api/connexions/${signUpData.value.connexion_id}`, {
+                method: 'DELETE'
+            });
             throw new Error('Erreur lors de la création de l\'utilisateur.');
         }
 
-        router.push('/');
-        message.value = 'Inscription réussie!'; // n'apparait pas => à revoir
+        // Connexion automatique de l'utilisateur
+        await loginUser(signUpData.value.login, signUpData.value.password);
 
     } catch (error) {
         message.value = error.message || 'Erreur lors de l\'inscription.';
