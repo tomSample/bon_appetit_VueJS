@@ -56,11 +56,26 @@
                 <button class="submit-button" id="create__button" @click="submitForm">Enregistrer</button>
             </div>
         </section>
+
+        <section class="create-container" id="create-container-list">
+            <div class="resto-resume body-padding" id="item__description">
+                <div class="_w_50 mobile-resto-presentation">
+                    <h4>Liste des items :</h4>
+                    <RouterLink v-for="restaurant in filteredRestaurants" :key="restaurant.id" :to="{ name: 'restaurant', params: { id: restaurant.id } }">
+                    <itemRestaurant :restaurant="restaurant" />
+                </RouterLink>
+                </div>
+            </div>
+            <div class="create__shop">
+                <button class="submit-button" id="item__button" >Enregistrer</button>
+            </div>
+        </section>
     </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import itemRestaurant from '@/components/itemRestaurant.vue';
 
 const restaurant = ref({
     name: '',
