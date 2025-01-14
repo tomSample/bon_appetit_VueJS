@@ -15,12 +15,13 @@ const toggleCart = () => {
 
 const isLoggedIn = computed(() => authStore.isLoggedIn);
 const userRole = computed(() => authStore.userRole);
+const userId = computed(() => authStore.userId);
 
-// debug
-
-console.log('isLoggedIn :', isLoggedIn.value);
-console.log('userRole :', userRole.value);
-console.log('token:', authStore.token)
+// Debug
+console.log('isLoggedIn:', isLoggedIn.value);
+console.log('userRole:', userRole.value);
+console.log('userId:', userId.value);
+console.log('token:', authStore.token);
 
 </script>
 
