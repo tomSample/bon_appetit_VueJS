@@ -11,6 +11,7 @@ import Checkout from '@/views/Checkout.vue'
 import OwnerCreate from '@/views/OwnerCreate.vue'
 import OwnerDashboard from '@/views/OwnerDashboard.vue'
 import MyAccount from '@/views/MyAccount.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,23 +27,25 @@ const router = createRouter({
       component: Restaurant,
     },
 
-    //attribuer un role par le path
     {
       path: '/signup/client',
       name: 'signup-client',
       component: SignUp,
+      // attribuer le role 'client' par le path
       meta: { role : 2 },
     },
     {
       path: '/signup/owner',
       name: 'signup-owner',
       component: SignUp,
+      // attribuer le role 'restaurateur' par le path
       meta: { role : 3 },
     },
     {
       path: '/signup/carrier',
       name: 'signup-carrier',
       component: SignUp,
+      // attribuer le role 'livreur' par le path
       meta: { role : 4 },
     },
     {
@@ -79,11 +82,15 @@ const router = createRouter({
       path: '/owner/create',
       name: 'owner-create',
       component: OwnerCreate,
+      // authentification requise et role 'restaurateur' nécessaire
+      meta: { requiresAuth: true, role: 'owner' },
     },
     {
       path: '/owner/dashboard',
       name: 'owner-dashboard',
       component: OwnerDashboard,
+      // authentification requise et role 'restaurateur' nécessaire
+      meta: { requiresAuth: true, role: 'owner' },
     },
     {
       path: '/my-account',
@@ -91,6 +98,20 @@ const router = createRouter({
       component: MyAccount,
     }
   ],
+});
+
+// permet de vérifier si l'utilisateur est connecté 
+// et si il a le bon role pour accéder à certaines pages
+// sinon le redirige vers la page de login
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+      next('/login');
+  } else if (to.meta.role && authStore.userRole !== to.meta.role) {
+      next('/');
+  } else {
+      next();
+  }
 });
 
 
