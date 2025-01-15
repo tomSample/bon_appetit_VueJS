@@ -32,21 +32,21 @@ const router = createRouter({
       name: 'signup-client',
       component: SignUp,
       // attribuer le role 'client' par le path
-      meta: { role : 2 },
+      meta: { requiresAuth: false, role : 2 },
     },
     {
       path: '/signup/owner',
       name: 'signup-owner',
       component: SignUp,
       // attribuer le role 'restaurateur' par le path
-      meta: { role : 3 },
+      meta:  { requiresAuth: false, role : 3 },
     },
     {
       path: '/signup/carrier',
       name: 'signup-carrier',
       component: SignUp,
       // attribuer le role 'livreur' par le path
-      meta: { role : 4 },
+      meta: { requiresAuth: false, role : 4 },
     },
     {
       path: '/login',
@@ -107,7 +107,7 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
       next('/login');
-  } else if (to.meta.role && authStore.userRole !== to.meta.role) {
+  } else if (to.meta.requiresAuth && to.meta.role && authStore.userRole !== to.meta.role) {
       next('/');
   } else {
       next();
