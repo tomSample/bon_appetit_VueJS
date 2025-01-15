@@ -47,3 +47,7 @@ const submitLogin = async () => {
     }
 };
 </script>
+
+<style scoped>
+/* Your styles here */
+</style>

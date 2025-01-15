@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { RouterView } from 'vue-router';
 import navBar from '@/components/navBar.vue';
 import foot from '@/components/foot.vue';
@@ -17,12 +17,13 @@ const isLoggedIn = computed(() => authStore.isLoggedIn);
 const userRole = computed(() => authStore.userRole);
 const userId = computed(() => authStore.userId);
 
-// Debug
-console.log('isLoggedIn:', isLoggedIn.value);
-console.log('userRole:', userRole.value);
-console.log('userId:', userId.value);
-console.log('token:', authStore.token);
-
+onMounted(() => {
+  // Debug
+  console.log('isLoggedIn:', isLoggedIn.value);
+  console.log('userRole:', userRole.value);
+  console.log('userId:', userId.value);
+  console.log('token:', authStore.token);
+});
 </script>
 
 <template>

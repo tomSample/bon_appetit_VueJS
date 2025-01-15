@@ -2,12 +2,12 @@ import { defineStore } from 'pinia';
 
 // Interface for representing the decoded token
 interface DecodedToken {
-    userId: string;
-    role: string;
+    sub: string; // Utilisé pour stocker l'ID de l'utilisateur
+    roleId: string; // Utilisé pour stocker l'ID du rôle de l'utilisateur
 }
 
 // Helper functions for localStorage
-const getToken = () => localStorage.getItem('token') || '';
+export const getToken = () => localStorage.getItem('token') || '';
 const setToken = (token: string) => localStorage.setItem('token', token);
 const clearStorage = () => localStorage.clear();
 
@@ -22,9 +22,9 @@ export const useAuthStore = defineStore('auth', {
     }),
     actions: {
         // Action to handle login
-        async login(login: string, password: string) {
+        async login(username: string, password: string) {
             try {
-                console.log('Attempting to log in with:', { login, password });
+                console.log('Attempting to log in with:', { username, password });
 
                 // Step 1: Verify the user's credentials
                 const response = await fetch('http://localhost:8080/api/connexions/check', {
@@ -32,7 +32,7 @@ export const useAuthStore = defineStore('auth', {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ login, password }),
+                    body: JSON.stringify({ login: username, password }),
                 });
 
                 if (!response.ok) {
@@ -41,16 +41,42 @@ export const useAuthStore = defineStore('auth', {
                 }
 
                 const userData = await response.json();
-                const token = userData.token;
+                const userId = userData.utilisateurId;
+                const userRole = userData.role;
                 console.log('User data received:', userData);
 
-                this.setAuthState(token);
+                // Step 2: Fetch the token from the backend
+                const tokenResponse = await fetch(`http://localhost:8080/api/generate-token?userId=${userId}`, {
+                    method: 'GET',
+                });
+
+                if (!tokenResponse.ok) {
+                    throw new Error('Failed to generate token');
+                }
+
+                const token = await tokenResponse.text();
+                console.log('Token received:', token);
+
+                // Step 3: Set the authentication state
+                this.token = token; // Update the token in the state
+                this.isLoggedIn = true; // Update the login state
+                setToken(this.token); // Store the token in localStorage
+                this.userId = userId; // Update the userId in the state
+                localStorage.setItem('userId', this.userId); // Store the userId in localStorage
+                this.userRole = userRole; // Update the userRole in the state
+                localStorage.setItem('userRole', this.userRole); // Store the userRole in localStorage
+
+                // Debug
+                console.log('Token:', this.token);
+                console.log('User ID:', this.userId);
+                console.log('User Role:', this.userRole);
             } catch (error) {
                 console.error('Login error:', error);
+                throw error;
             }
         },
         // Action to handle signup
-        async signUp(signUpData: { login: string, password: string, nom: string, prenom: string, email: string, telephone: string, role_id: number }) {
+        async signUp(signUpData: { username: string, password: string, nom: string, prenom: string, email: string, telephone: string, role_id: number }) {
             try {
                 console.log('Attempting to sign up with:', signUpData);
 
@@ -90,13 +116,13 @@ export const useAuthStore = defineStore('auth', {
             const decodedToken: DecodedToken = JSON.parse(atob(token.split('.')[1])); // Decode the JWT token
 
             // Debug
-            console.log('Token:', token);
+            // console.log('Token:', token);
             console.log('Decoded Token:', decodedToken); // Debug line to display the decoded token
 
-            if (decodedToken.userId) {
-                this.userId = decodedToken.userId; // Update the userId in the state
+            if (decodedToken.sub) {
+                this.userId = decodedToken.sub; // Update the userId in the state
                 localStorage.setItem('userId', this.userId); // Store the userId in localStorage
-                this.userRole = decodedToken.role; // Update the userRole in the state
+                this.userRole = decodedToken.roleId; // Update the userRole in the state
                 localStorage.setItem('userRole', this.userRole); // Store the userRole in localStorage
             } else {
                 console.error('User ID is undefined in the token'); // Log an error if the userId is undefined in the token
