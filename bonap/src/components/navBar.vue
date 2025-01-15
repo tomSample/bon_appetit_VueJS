@@ -46,6 +46,7 @@ const logout = () => {
     window.location.reload(); // Rafraîchir la page après la déconnexion
 };
 
+// Utiliser les données de l'authentification
 const isLoggedIn = computed(() => authStore.isLoggedIn);
 const userRole = computed(() => authStore.userRole);
 </script>

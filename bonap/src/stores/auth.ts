@@ -11,6 +11,24 @@ export const getToken = () => localStorage.getItem('token') || '';
 const setToken = (token: string) => localStorage.setItem('token', token);
 const clearStorage = () => localStorage.clear();
 
+// Helper function to include the token in the headers
+const authFetch = async (url: string, options: RequestInit = {}) => {
+    const token = getToken();
+    const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+    };
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(url, { ...options, headers });
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Request failed');
+    }
+    return response.json();
+};
+
 // Define the Pinia store for authentication
 export const useAuthStore = defineStore('auth', {
     // Initial state of the store
@@ -27,7 +45,7 @@ export const useAuthStore = defineStore('auth', {
                 console.log('Attempting to log in with:', { username, password });
 
                 // Step 1: Verify the user's credentials
-                const response = await fetch('http://localhost:8080/api/connexions/check', {
+                const userData = await authFetch('http://localhost:8080/api/connexions/check', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -35,12 +53,6 @@ export const useAuthStore = defineStore('auth', {
                     body: JSON.stringify({ login: username, password }),
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Login failed');
-                }
-
-                const userData = await response.json();
                 const userId = userData.utilisateurId;
                 const userRole = userData.role;
                 console.log('User data received:', userData);
@@ -50,11 +62,7 @@ export const useAuthStore = defineStore('auth', {
                     method: 'GET',
                 });
 
-                if (!tokenResponse.ok) {
-                    throw new Error('Failed to generate token');
-                }
-
-                const token = await tokenResponse.text();
+                const token = tokenResponse.token;
                 console.log('Token received:', token);
 
                 // Step 3: Set the authentication state
@@ -80,7 +88,7 @@ export const useAuthStore = defineStore('auth', {
             try {
                 console.log('Attempting to sign up with:', signUpData);
 
-                const response = await fetch('http://localhost:8080/api/signup', {
+                const token = await authFetch('http://localhost:8080/api/signup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -88,12 +96,6 @@ export const useAuthStore = defineStore('auth', {
                     body: JSON.stringify(signUpData),
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Signup failed');
-                }
-
-                const token = await response.text();
                 console.log('Token received:', token);
                 this.setAuthState(token);
             } catch (error) {
@@ -116,7 +118,6 @@ export const useAuthStore = defineStore('auth', {
             const decodedToken: DecodedToken = JSON.parse(atob(token.split('.')[1])); // Decode the JWT token
 
             // Debug
-            // console.log('Token:', token);
             console.log('Decoded Token:', decodedToken); // Debug line to display the decoded token
 
             if (decodedToken.sub) {
