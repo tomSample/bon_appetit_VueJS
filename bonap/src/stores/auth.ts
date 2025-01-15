@@ -62,7 +62,12 @@ export const useAuthStore = defineStore('auth', {
                     method: 'GET',
                 });
 
-                const token = tokenResponse.token;
+                if (!tokenResponse.ok) {
+                    const errorData = await tokenResponse.json();
+                    throw new Error(errorData.message || 'Failed to generate token');
+                }
+
+                const token = await tokenResponse.text();
                 console.log('Token received:', token);
 
                 // Step 3: Set the authentication state
