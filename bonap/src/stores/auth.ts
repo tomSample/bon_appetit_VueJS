@@ -45,7 +45,7 @@ export const useAuthStore = defineStore('auth', {
                 console.log('Attempting to log in with:', { username, password });
 
                 // Step 1: Verify the user's credentials
-                const userData = await authFetch('http://localhost:8080/api/connexions/check', {
+                const userData = await fetch('http://localhost:8080/api/connexions/check', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -71,18 +71,7 @@ export const useAuthStore = defineStore('auth', {
                 console.log('Token received:', token);
 
                 // Step 3: Set the authentication state
-                this.token = token; // Update the token in the state
-                this.isLoggedIn = true; // Update the login state
-                setToken(this.token); // Store the token in localStorage
-                this.userId = userId; // Update the userId in the state
-                localStorage.setItem('userId', this.userId); // Store the userId in localStorage
-                this.userRole = userRole; // Update the userRole in the state
-                localStorage.setItem('userRole', this.userRole); // Store the userRole in localStorage
-
-                // Debug
-                console.log('Token:', this.token);
-                console.log('User ID:', this.userId);
-                console.log('User Role:', this.userRole);
+                this.setAuthState(token, userId, userRole);
             } catch (error) {
                 console.error('Login error:', error);
                 throw error;
@@ -93,7 +82,9 @@ export const useAuthStore = defineStore('auth', {
             try {
                 console.log('Attempting to sign up with:', signUpData);
 
-                // Extract the raw data from the Proxy object
+                
+                // Extraire les données brutes de l'objet Proxy `signUpData` (objet réactif) et les placer dans un nouvel objet `rawData`.
+                // Cela permet de travailler avec une copie des données sans les références Proxy.
                 const rawData = { ...signUpData };
 
                 const response = await fetch('http://localhost:8080/api/utilisateurs', {
@@ -111,7 +102,25 @@ export const useAuthStore = defineStore('auth', {
 
                 const responseData = await response.json();
                 console.log('Response received:', responseData);
-                this.setAuthState(responseData.token);
+
+                const userId = responseData.id;
+                const userRole = responseData.role;
+
+                // Fetch the token from the backend
+                const tokenResponse = await fetch(`http://localhost:8080/api/generate-token?userId=${userId}`, {
+                    method: 'GET',
+                });
+
+                if (!tokenResponse.ok) {
+                    const errorData = await tokenResponse.json();
+                    throw new Error(errorData.message || 'Failed to generate token');
+                }
+
+                const token = await tokenResponse.text();
+                console.log('Token received:', token);
+
+                // Set the authentication state with the token, user ID, and role
+                this.setAuthState(token, userId, userRole);
             } catch (error) {
                 console.error('Signup error:', error);
             }
@@ -125,23 +134,19 @@ export const useAuthStore = defineStore('auth', {
             this.isLoggedIn = false; // Update the login state
         },
         // Helper method to set authentication state
-        setAuthState(token: string) {
+        setAuthState(token: string, userId: number, userRole: string) {
             this.token = token; // Update the token in the state
             this.isLoggedIn = true; // Update the login state
             setToken(token); // Store the token in localStorage
-            const decodedToken: DecodedToken = JSON.parse(atob(token.split('.')[1])); // Decode the JWT token
+            this.userId = userId; // Update the userId in the state
+            localStorage.setItem('userId', this.userId.toString()); // Store the userId in localStorage
+            this.userRole = userRole; // Update the userRole in the state
+            localStorage.setItem('userRole', this.userRole); // Store the userRole in localStorage
 
             // Debug
-            console.log('Decoded Token:', decodedToken); // Debug line to display the decoded token
-
-            if (decodedToken.sub) {
-                this.userId = decodedToken.sub; // Update the userId in the state
-                localStorage.setItem('userId', this.userId); // Store the userId in localStorage
-                this.userRole = decodedToken.roleId; // Update the userRole in the state
-                localStorage.setItem('userRole', this.userRole); // Store the userRole in localStorage
-            } else {
-                console.error('User ID is undefined in the token'); // Log an error if the userId is undefined in the token
-            }
+            console.log('Token:', this.token);
+            console.log('User ID:', this.userId);
+            console.log('User Role:', this.userRole);
         },
     },
 });
