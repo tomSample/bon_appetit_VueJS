@@ -40,12 +40,13 @@ export const useAuthStore = defineStore('auth', {
     }),
     actions: {
         // Action to handle login
+        // Action to handle login
         async login(username: string, password: string) {
             try {
                 console.log('Attempting to log in with:', { username, password });
 
                 // Step 1: Verify the user's credentials
-                const userData = await fetch('http://localhost:8080/api/connexions/check', {
+                const response = await fetch('http://localhost:8080/api/connexions/check', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -53,6 +54,12 @@ export const useAuthStore = defineStore('auth', {
                     body: JSON.stringify({ login: username, password }),
                 });
 
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Login request failed');
+                }
+
+                const userData = await response.json();
                 const userId = userData.utilisateurId;
                 const userRole = userData.role;
                 console.log('User data received:', userData);
