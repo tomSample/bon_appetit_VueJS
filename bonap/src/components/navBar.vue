@@ -32,8 +32,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router'; // Importer useRouter
 
 const authStore = useAuthStore();
+const router = useRouter(); // Obtenir l'objet router
 
 const dropdownOpen = ref(false);
 
@@ -42,8 +44,8 @@ const toggleDropdown = () => {
 };
 
 const logout = () => {
-    authStore.logout();
-    window.location.reload(); // Rafraîchir la page après la déconnexion
+    authStore.logout(router); // Passer l'objet router à la méthode logout
+    // window.location.reload(); // Supprimer cette ligne pour éviter les problèmes de redirection
 };
 
 // Utiliser les données de l'authentification

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { useRouter } from 'vue-router'; // Importer useRouter
 
 // Interface for representing the decoded token
 interface DecodedToken {
@@ -39,7 +40,6 @@ export const useAuthStore = defineStore('auth', {
         userId: localStorage.getItem('userId') || '', // Retrieve the user's ID from localStorage or initialize to an empty string
     }),
     actions: {
-        // Action to handle login
         // Action to handle login
         async login(username: string, password: string) {
             try {
@@ -89,7 +89,6 @@ export const useAuthStore = defineStore('auth', {
             try {
                 console.log('Attempting to sign up with:', signUpData);
 
-                
                 // Extraire les données brutes de l'objet Proxy `signUpData` (objet réactif) et les placer dans un nouvel objet `rawData`.
                 // Cela permet de travailler avec une copie des données sans les références Proxy.
                 const rawData = { ...signUpData };
@@ -133,12 +132,13 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         // Action to handle logout
-        logout() {
+        logout(router) {
             clearStorage(); // Clear all localStorage items
             this.token = ''; // Reset the token in the state
             this.userRole = ''; // Reset the userRole in the state
             this.userId = ''; // Reset the userId in the state
             this.isLoggedIn = false; // Update the login state
+            router.replace('/'); // Utiliser replace pour rediriger vers la page d'accueil
         },
         // Helper method to set authentication state
         setAuthState(token: string, userId: number, userRole: string) {
