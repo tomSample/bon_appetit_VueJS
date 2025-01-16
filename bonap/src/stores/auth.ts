@@ -89,20 +89,29 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         // Action to handle signup
-        async signUp(signUpData: { username: string, password: string, nom: string, prenom: string, email: string, telephone: string, role_id: number }) {
+        async signUp(signUpData: { username: string, password: string, nom: string, prenom: string, email: string, telephone: string, numero: string, rue: string, complement: string, ville: string, codePostal: string, role_id: number }) {
             try {
                 console.log('Attempting to sign up with:', signUpData);
 
-                const token = await authFetch('http://localhost:8080/api/signup', {
+                // Extract the raw data from the Proxy object
+                const rawData = { ...signUpData };
+
+                const response = await fetch('http://localhost:8080/api/utilisateurs', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(signUpData),
+                    body: JSON.stringify(rawData),
                 });
 
-                console.log('Token received:', token);
-                this.setAuthState(token);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Signup request failed');
+                }
+
+                const responseData = await response.json();
+                console.log('Response received:', responseData);
+                this.setAuthState(responseData.token);
             } catch (error) {
                 console.error('Signup error:', error);
             }
