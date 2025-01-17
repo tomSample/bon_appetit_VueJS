@@ -1,221 +1,228 @@
 <template>
-    <div class="create-restaurant-form">
-        <h2>Créer un Restaurant</h2>
-        <form @submit.prevent="submitRestaurant">
-            <div class="form-group">
-                <label for="siret">SIRET :</label>
-                <input type="text" id="siret" v-model="restaurantData.siret" required />
-            </div>
-            <div class="form-group">
-                <label for="nom">Nom :</label>
-                <input type="text" id="nom" v-model="restaurantData.nom" required />
-            </div>
-            <div class="form-group">
-                <label for="nombreCouvert">Nombre de Couverts :</label>
-                <input type="number" id="nombreCouvert" v-model="restaurantData.nombreCouvert" required />
-            </div>
-            <div class="form-group">
-                <label for="capacite">Capacité :</label>
-                <input type="number" id="capacite" v-model="restaurantData.capacite" required />
-            </div>
-            <div class="form-group">
-                <label for="telephone">Téléphone :</label>
-                <input type="text" id="telephone" v-model="restaurantData.telephone" required />
-            </div>
-            <div class="form-group">
-                <label for="photo">Photo :</label>
-                <input type="file" id="photo" @change="handleFileUpload" />
-            </div>
-            <div class="form-group">
-                <label for="description">Description :</label>
-                <textarea id="description" v-model="restaurantData.description" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="isOpen">Ouvert :</label>
-                <input type="checkbox" id="isOpen" v-model="restaurantData.isOpen" />
-            </div>
-            <div class="form-group">
-                <label for="delaiPreparationCommande">Délai de Préparation des Commandes (minutes) :</label>
-                <input type="number" id="delaiPreparationCommande" v-model="restaurantData.delaiPreparationCommande" required />
-            </div>
-            <div class="form-group">
-                <label for="typeCuisine">Type de Cuisine :</label>
-                <select id="typeCuisine" v-model="selectedTypeCuisineId" required>
-                    <option v-for="type in typesCuisine" :key="type.id" :value="type.id">{{ type.nom }}</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="adresse">Adresse :</label>
-                <input type="text" id="numero" v-model="adresseData.numero" placeholder="Numéro" required />
-                <input type="text" id="rue" v-model="adresseData.rue" placeholder="Rue" required />
-                <input type="text" id="complement" v-model="adresseData.complement" placeholder="Complément" />
-            </div>
-            <div class="form-group">
-                <label for="ville">Ville :</label>
-                <input type="text" id="villeNom" v-model="villeData.nom" placeholder="Ville" required />
-                <input type="text" id="codePostal" v-model="villeData.codePostal" placeholder="Code Postal" required />
-            </div>
-            <button type="submit" class="submit-button">Créer le Restaurant</button>
-        </form>
-        <p v-if="message" class="message">{{ message }}</p>
-    </div>
+  <div class="search-city-form">
+    <h2>Rechercher une Ville</h2>
+    <form @submit.prevent="validateCity">
+      <div class="form-group">
+        <label for="cityName">Nom de la Ville :</label>
+        <input type="text" id="cityName" v-model="cityName" @input="onCityNameInput" placeholder="Entrez le nom de la ville" />
+        <ul v-if="cityNameResults.length > 0" class="dropdown">
+          <li v-for="city in cityNameResults" :key="city.code" @click="selectCity(city)">
+            {{ city.nom }} ({{ city.codesPostaux.join(', ') }})
+          </li>
+        </ul>
+      </div>
+      <div class="form-group">
+        <label for="postalCode">Code Postal :</label>
+        <input type="text" id="postalCode" v-model="postalCode" @input="onPostalCodeInput" placeholder="Entrez le code postal" />
+        <ul v-if="postalCodeResults.length > 0" class="dropdown">
+          <li v-for="city in postalCodeResults" :key="city.code" @click="selectCity(city)">
+            {{ city.nom }} ({{ city.codesPostaux.join(', ') }})
+          </li>
+        </ul>
+      </div>
+      <button type="submit" class="submit-button">Valider</button>
+    </form>
+    <p v-if="message" class="message">{{ message }}</p>
+  </div>
 </template>
 
 <script setup>
-// filepath: /c:/Users/thoma/Desktop/Projets/bon_appetit_VueJS/bonap/src/views/OwnerCreateRestaurant.vue
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import { ref } from 'vue';
 
-const authStore = useAuthStore();
-const router = useRouter();
-
-const restaurantData = ref({
-    siret: '',
-    nom: '',
-    nombreCouvert: 0,
-    capacite: 0,
-    telephone: '',
-    photo: null,
-    description: '',
-    isOpen: false,
-    delaiPreparationCommande: 0,
-    utilisateur: { id: authStore.userId }, // Send an object with the user ID
-    adresse: {}, // This will be set from the address and city details
-    typeCuisineHasRestaurants: [] // Initialize as an empty array
-});
-
-const adresseData = ref({
-    numero: '',
-    rue: '',
-    complement: ''
-});
-
-const villeData = ref({
-    nom: '',
-    codePostal: ''
-});
-
-const typesCuisine = ref([]);
-const selectedTypeCuisineId = ref(null);
+const cityName = ref('');
+const postalCode = ref('');
+const cityNameResults = ref([]);
+const postalCodeResults = ref([]);
 const message = ref('');
+const villeId = ref(null);
 
-onMounted(async () => {
-    try {
-        const response = await fetch('http://localhost:8080/api/typecuisines');
-        if (!response.ok) {
-            throw new Error('Failed to fetch types of cuisine');
-        }
-        typesCuisine.value = await response.json();
-    } catch (error) {
-        console.error('Error fetching types of cuisine:', error);
+const validateCity = async () => {
+  try {
+    // Vérifier l'existence de la ville via l'API gouvernementale
+    const response = await fetch(`https://geo.api.gouv.fr/communes?nom=${cityName.value}&codePostal=${postalCode.value}&fields=nom,codesPostaux&format=json`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to validate city');
     }
-});
 
-const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        restaurantData.value.photo = e.target.result;
-    };
-    reader.readAsDataURL(file);
+    const villes = await response.json();
+    if (villes.length > 0) {
+      const ville = villes[0];
+      villeId.value = ville.code;
+      message.value = `Ville validée avec succès : ${ville.nom} (${ville.codesPostaux.join(', ')})`;
+
+      // Créer la ville dans la base de données si elle n'existe pas
+      const createResponse = await fetch('http://localhost:8080/api/villes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ nom: ville.nom, codePostal: ville.codesPostaux[0] })
+      });
+
+      if (!createResponse.ok) {
+        const errorData = await createResponse.json();
+        throw new Error(errorData.message || 'Failed to create city in database');
+      }
+
+      const createdVille = await createResponse.json();
+      villeId.value = createdVille.id;
+    } else {
+      message.value = 'Ville non trouvée';
+    }
+  } catch (error) {
+    message.value = error.message || 'Erreur lors de la validation de la ville';
+  }
 };
 
-const submitRestaurant = async () => {
-    try {
-        // Add the selected type of cuisine to the restaurant data
-        restaurantData.value.typeCuisineHasRestaurants.push({
-            typeCuisine: { id: selectedTypeCuisineId.value }
-        });
-
-        // Add the address and city details to the restaurant data
-        restaurantData.value.adresse = {
-            ...adresseData.value,
-            ville: villeData.value
-        };
-
-        // Create the restaurant with address and city details
-        const restaurantResponse = await fetch('http://localhost:8080/api/restaurants', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(restaurantData.value),
-        });
-
-        if (!restaurantResponse.ok) {
-            const errorData = await restaurantResponse.json();
-            throw new Error(errorData.message || 'Failed to create restaurant');
-        }
-
-        message.value = 'Restaurant créé avec succès';
-        router.push('/owner/dashboard'); // Redirect to the owner's dashboard after successful creation
-    } catch (error) {
-        message.value = error.message || 'Erreur lors de la création du restaurant';
+const searchCity = async () => {
+  try {
+    let query = '';
+    if (cityName.value) {
+      query = `nom=${cityName.value}&fields=nom,codesPostaux&format=json`;
+    } else if (postalCode.value) {
+      query = `codePostal=${postalCode.value}&fields=nom,codesPostaux&format=json`;
     }
+
+    const response = await fetch(`https://geo.api.gouv.fr/communes?${query}`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to fetch city');
+    }
+
+    cityResults.value = await response.json();
+    message.value = '';
+  } catch (error) {
+    message.value = error.message || 'Erreur lors de la recherche de la ville';
+    cityResults.value = [];
+  }
+};
+
+const onCityNameInput = async () => {
+  if (cityName.value.length > 0) {
+    try {
+      const response = await fetch(`https://geo.api.gouv.fr/communes?nom=${cityName.value}&fields=nom,codesPostaux&format=json`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch city');
+      }
+      cityNameResults.value = await response.json();
+    } catch (error) {
+      message.value = error.message || 'Erreur lors de la recherche de la ville';
+      cityNameResults.value = [];
+    }
+  } else {
+    cityNameResults.value = [];
+  }
+};
+
+const onPostalCodeInput = async () => {
+  if (postalCode.value.length > 0) {
+    try {
+      const response = await fetch(`https://geo.api.gouv.fr/communes?codePostal=${postalCode.value}&fields=nom,codesPostaux&format=json`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch city');
+      }
+      postalCodeResults.value = await response.json();
+    } catch (error) {
+      message.value = error.message || 'Erreur lors de la recherche de la ville';
+      postalCodeResults.value = [];
+    }
+  } else {
+    postalCodeResults.value = [];
+  }
+};
+
+const selectCity = (city) => {
+  cityName.value = city.nom;
+  postalCode.value = city.codesPostaux[0];
+  cityNameResults.value = [];
+  postalCodeResults.value = [];
 };
 </script>
 
 <style scoped>
-.create-restaurant-form {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.search-city-form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
-    text-align: center;
-    margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .form-group {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
+  position: relative;
 }
 
 label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
 }
 
-input[type="text"],
-input[type="number"],
-input[type="file"],
-textarea,
-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-input[type="checkbox"] {
-    margin-right: 10px;
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  position: relative; /* Ajouté */
+  z-index: 1; /* Ajouté */
 }
 
 .submit-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
 }
 
 .submit-button:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
+}
+
+.results {
+  margin-top: 20px;
 }
 
 .message {
-    text-align: center;
-    margin-top: 20px;
-    color: red;
+  text-align: center;
+  margin-top: 20px;
+  color: red;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  max-height: 100px; /* Réduire la taille du dropdown */
+  overflow-y: auto;
+  z-index: 1000; /* Ajouté */
+}
+
+.dropdown li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown li:hover {
+  background-color: #f0f0f0;
 }
 </style>
