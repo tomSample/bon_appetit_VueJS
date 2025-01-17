@@ -10,7 +10,7 @@
                 <label for="password">Mot de passe :</label>
                 <input type="password" id="password" v-model="loginData.password" required />
             </div>
-            <button type="submit">Se connecter</button>
+            <button type="submit" class="submit-button">Se connecter</button>
         </form>
         <p>
             <router-link to="/reset-co">Mot de passe oublié ?</router-link>
@@ -49,5 +49,61 @@ const submitLogin = async () => {
 </script>
 
 <style scoped>
-/* Your styles here */
+.login-form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.submit-button:hover {
+    background-color: #0056b3;
+}
+
+.message {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.error {
+    color: red;
+}
 </style>

@@ -8,7 +8,7 @@ import CondGe from '@/views/ConditionsGenerales.vue'
 import About from '@/views/About.vue'
 import ResetCo from '@/views/ResetCo.vue'
 import Checkout from '@/views/Checkout.vue'
-import OwnerCreate from '@/views/OwnerCreate.vue'
+import OwnerCreateRestaurant from '@/views/OwnerCreateRestaurant.vue'
 import OwnerDashboard from '@/views/OwnerDashboard.vue'
 import MyAccount from '@/views/MyAccount.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -26,27 +26,23 @@ const router = createRouter({
       name: 'restaurant',
       component: Restaurant,
     },
-
     {
       path: '/signup/client',
       name: 'signup-client',
       component: SignUp,
-      // attribuer le role 'client' par le path
-      meta: { requiresAuth: false, role : 2 },
+      meta: { requiresAuth: false, role: 2 },
     },
     {
       path: '/signup/owner',
       name: 'signup-owner',
       component: SignUp,
-      // attribuer le role 'restaurateur' par le path
-      meta:  { requiresAuth: false, role : 3 },
+      meta: { requiresAuth: false, role: 3 },
     },
     {
       path: '/signup/carrier',
       name: 'signup-carrier',
       component: SignUp,
-      // attribuer le role 'livreur' par le path
-      meta: { requiresAuth: false, role : 4 },
+      meta: { requiresAuth: false, role: 4 },
     },
     {
       path: '/login',
@@ -59,8 +55,8 @@ const router = createRouter({
       component: Mentions,
     },
     {
-      path:'/conditions-generales',
-      name:'conditions-generales',
+      path: '/conditions-generales',
+      name: 'conditions-generales',
       component: CondGe,
     },
     {
@@ -81,15 +77,13 @@ const router = createRouter({
     {
       path: '/owner/create',
       name: 'owner-create',
-      component: OwnerCreate,
-      // authentification requise et role 'restaurateur' nécessaire
+      component: OwnerCreateRestaurant,
       meta: { requiresAuth: true, role: 'owner' },
     },
     {
       path: '/owner/dashboard',
       name: 'owner-dashboard',
       component: OwnerDashboard,
-      // authentification requise et role 'restaurateur' nécessaire
       meta: { requiresAuth: true, role: 'owner' },
     },
     {
@@ -100,19 +94,17 @@ const router = createRouter({
   ],
 });
 
-// permet de vérifier si l'utilisateur est connecté 
-// et si il a le bon role pour accéder à certaines pages
-// sinon le redirige vers la page de login
+// Vérifie si l'utilisateur est connecté et a le bon rôle pour accéder à certaines pages
+// Sinon, redirige vers la page de login ou la page d'accueil
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-      next('/login');
+    next('/login');
   } else if (to.meta.requiresAuth && to.meta.role && authStore.userRole !== to.meta.role) {
-      next('/');
+    next('/');
   } else {
-      next();
+    next();
   }
 });
 
-
-export default router
+export default router;
