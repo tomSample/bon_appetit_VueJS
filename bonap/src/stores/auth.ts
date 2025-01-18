@@ -101,12 +101,16 @@ export const useAuthStore = defineStore('auth', {
                     body: JSON.stringify(rawData),
                 });
 
+                // Log the raw response text for debugging
+                const responseText = await response.text();
+                console.log('Raw response text:', responseText);
+
                 if (!response.ok) {
-                    const errorData = await response.json();
+                    const errorData = JSON.parse(responseText);
                     throw new Error(errorData.message || 'Signup request failed');
                 }
 
-                const responseData = await response.json();
+                const responseData = JSON.parse(responseText);
                 console.log('Response received:', responseData);
 
                 const userId = responseData.id;
