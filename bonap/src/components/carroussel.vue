@@ -1,3 +1,9 @@
+<!-- 
+carroussel.vue :
+Ce composant affiche un carrousel interactif de types de cuisine. 
+Il permet de naviguer entre les types de cuisine et d'appliquer un filtre en fonction du type sélectionné.
+-->
+
 <template>
     <div class="carrousel">
         <button @click="prev" class="nav-button">‹</button>

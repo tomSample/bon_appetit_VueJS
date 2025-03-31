@@ -1,110 +1,114 @@
+<!-- 
+SignUp.vue :
+Cette vue permet aux utilisateurs de créer un compte en remplissant un formulaire d'inscription. 
+Elle collecte des informations personnelles telles que le nom, l'email, l'adresse, et le mot de passe, 
+et envoie ces données à l'API pour créer un nouvel utilisateur.
+-->
+
 <template>
     <div class="signup-container">
         <h2>Sign Up</h2>
         <form @submit.prevent="submitSignUp">
-            <div>
-                <label for="login">Login:</label>
-                <input type="text" id="login" v-model="signUpData.login" required />
-            </div>
-            <div>
-                <label for="password">Password:</label>
-                <input type="password" id="password" v-model="signUpData.password" required />
-            </div>
-            <div>
-                <label for="nom">Last Name:</label>
-                <input type="text" id="nom" v-model="signUpData.nom" required />
-            </div>
-            <div>
-                <label for="prenom">First Name:</label>
-                <input type="text" id="prenom" v-model="signUpData.prenom" required />
-            </div>
-            <div>
-                <label for="email">Email:</label>
-                <input type="email" id="email" v-model="signUpData.email" required />
-            </div>
-            <div>
-                <label for="telephone">Phone:</label>
-                <input type="text" id="telephone" v-model="signUpData.telephone" required />
+            <div class="form-columns">
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="username">Login:</label>
+                        <input type="text" id="username" v-model="signUpData.username" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" v-model="signUpData.password" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="nom">Last Name:</label>
+                        <input type="text" id="nom" v-model="signUpData.nom" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="prenom">First Name:</label>
+                        <input type="text" id="prenom" v-model="signUpData.prenom" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" v-model="signUpData.email" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="telephone">Phone:</label>
+                        <input type="text" id="telephone" v-model="signUpData.telephone" required />
+                    </div>
+                </div>
+                <div class="form-column">
+                    <div class="form-group">
+                        <label for="numero">Street Number:</label>
+                        <input type="text" id="numero" v-model="signUpData.numero" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="rue">Street:</label>
+                        <input type="text" id="rue" v-model="signUpData.rue" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="complement">Complement:</label>
+                        <input type="text" id="complement" v-model="signUpData.complement" />
+                    </div>
+                    <div class="form-group">
+                        <label for="ville">City:</label>
+                        <input type="text" id="ville" v-model="signUpData.ville" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="codePostal">Postal Code:</label>
+                        <input type="text" id="codePostal" v-model="signUpData.codePostal" required />
+                    </div>
+                </div>
             </div>
             <input type="hidden" v-model="signUpData.role_id" />
-            <input type="hidden" v-model="signUpData.connexion_id" />
-            <button type="submit">Sign Up</button>
+            <button type="submit" class="submit-button">Sign Up</button>
         </form>
-        <p v-if="message">{{ message }}</p>
+        <p v-if="message" class="message">{{ message }}</p>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
+// Définir les données d'inscription
 const signUpData = ref({
-    login: '',
+    username: '',
     password: '',
     nom: '',
     prenom: '',
     email: '',
     telephone: '',
-    role_id: null,
-    connexion_id: null // sera récupérée par la suite (plus bas)
+    numero: '',
+    rue: '',
+    complement: '',
+    ville: '',
+    codePostal: '',
+    role_id: null
 });
 
 const message = ref('');
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
+// Récupérer le rôle à partir des métadonnées de la route lors du montage du composant
 onMounted(() => {
-    // Récupérer le rôle à partir des métadonnées de la route
     signUpData.value.role_id = route.meta.role;
 });
 
+// Fonction pour soumettre les données d'inscription
 const submitSignUp = async () => {
     try {
-        // Etape 1: envoyer les données à la table Connexion
-        const connexionResponse = await fetch('http://localhost:8080/api/connexions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                login: signUpData.value.login,
-                password: signUpData.value.password
-            })
-        });
-
-        if (!connexionResponse.ok) {
-            if (connexionResponse.status === 409) {
-                throw new Error('Nom d\'utilisateur indisponible.');
-            }
-            throw new Error('Erreur lors de la création de la connexion.');
+        // Vérifier si les champs utilisateur sont complets
+        if (!signUpData.value.nom || !signUpData.value.prenom || !signUpData.value.email || !signUpData.value.telephone || !signUpData.value.numero || !signUpData.value.rue || !signUpData.value.ville || !signUpData.value.codePostal) {
+            throw new Error('Veuillez remplir tous les champs utilisateur.');
         }
 
-        const connexionData = await connexionResponse.json();
-        signUpData.value.connexion_id = connexionData.id; // Récupérer valeur de connexion_id
-
-        // Etape 2: envoyer les données à la table Utilisateur
-        const utilisateurResponse = await fetch('http://localhost:8080/api/utilisateurs', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                nom: signUpData.value.nom,
-                prenom: signUpData.value.prenom,
-                email: signUpData.value.email,
-                telephone: signUpData.value.telephone,
-                role: { id: signUpData.value.role_id }, // Inclure Role (objet)
-                connexion: { id: signUpData.value.connexion_id } // Inclure Connexion (objet)
-            })
-        });
-
-        if (!utilisateurResponse.ok) {
-            throw new Error('Erreur lors de la création de l\'utilisateur.');
-        }
-
-        router.push('/');
-        message.value = 'Inscription réussie!'; // n'apparait pas => à revoir
-
+        // Envoyer les données d'inscription
+        await authStore.signUp({ ...signUpData.value });
+        message.value = 'Inscription réussie';
+        router.push('/'); // Rediriger vers la page d'accueil après l'inscription réussie
     } catch (error) {
         message.value = error.message || 'Erreur lors de l\'inscription.';
     }
@@ -113,44 +117,67 @@ const submitSignUp = async () => {
 
 <style scoped>
 .signup-container {
-    max-width: 400px;
+    max-width: 800px;
     margin: 0 auto;
-    padding: 1em;
+    padding: 20px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.signup-container h2 {
+h2 {
     text-align: center;
+    margin-bottom: 20px;
 }
 
-.signup-container form {
+.form-columns {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
 }
 
-.signup-container form div {
-    margin-bottom: 1em;
+.form-column {
+    width: 48%;
 }
 
-.signup-container form label {
-    margin-bottom: 0.5em;
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
     font-weight: bold;
 }
 
-.signup-container form input {
-    padding: 0.5em;
-    font-size: 1em;
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
 }
 
-.signup-container form button {
-    padding: 0.5em;
-    font-size: 1em;
+.submit-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
 }
 
-.signup-container p {
+.submit-button:hover {
+    background-color: #0056b3;
+}
+
+.message {
     text-align: center;
+    margin-top: 20px;
     color: red;
 }
 </style>

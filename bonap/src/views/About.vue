@@ -1,3 +1,10 @@
+<!-- 
+About.vue :
+Cette vue fournit des informations sur le projet, y compris les technologies utilisées 
+(Java Spring Boot, Vue.js, etc.) et les développeurs impliqués. 
+Elle sert de page informative pour les utilisateurs.
+-->
+
 <template>
     <div class="about-container">
         <h1>À propos</h1>

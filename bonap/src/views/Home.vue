@@ -1,3 +1,10 @@
+<!-- 
+Home.vue :
+Cette vue représente la page d'accueil de l'application. 
+Elle affiche une barre de recherche, un carrousel de types de cuisine, 
+et une liste de restaurants filtrables par type de cuisine ou recherche.
+-->
+
 <template>
     <main>
         <!--  titre + barre de recherche -->

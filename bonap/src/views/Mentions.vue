@@ -1,3 +1,9 @@
+<!-- 
+Mentions.vue :
+Cette vue affiche les mentions légales du site, y compris les informations sur les responsables, 
+les droits d'auteur, et les sources des images utilisées.
+-->
+
 <template>
     <section class="hero-banner">
         <div class="mentions-container">

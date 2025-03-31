@@ -1,16 +1,22 @@
+<!-- 
+Login.vue :
+Cette vue permet aux utilisateurs de se connecter à leur compte en saisissant leur login et mot de passe. 
+Elle gère également les erreurs de connexion et redirige les utilisateurs après une connexion réussie.
+-->
+
 <template>
     <div class="login-form">
         <h2>Connexion</h2>
         <form @submit.prevent="submitLogin">
             <div class="form-group">
-                <label for="login">Login :</label>
-                <input type="text" id="login" v-model="loginData.login" required />
+                <label for="username">Login :</label>
+                <input type="text" id="username" v-model="loginData.username" required />
             </div>
             <div class="form-group">
                 <label for="password">Mot de passe :</label>
                 <input type="password" id="password" v-model="loginData.password" required />
             </div>
-            <button type="submit">Se connecter</button>
+            <button type="submit" class="submit-button">Se connecter</button>
         </form>
         <p>
             <router-link to="/reset-co">Mot de passe oublié ?</router-link>
@@ -28,7 +34,7 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 const loginData = ref({
-    login: '',
+    username: '',
     password: ''
 });
 
@@ -37,28 +43,10 @@ const isError = ref(false);
 
 const submitLogin = async () => {
     try {
-        const response = await fetch('http://localhost:8080/api/connexions/check', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                login: loginData.value.login,
-                password: loginData.value.password,
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Login failed');
-        }
-
-        const data = await response.json();
-        await authStore.login(data.token);
+        await authStore.login(loginData.value.username, loginData.value.password);
         message.value = 'Connexion réussie';
         isError.value = false;
         router.push('/'); // Rediriger vers la page d'accueil ou une autre page après la connexion réussie
-
     } catch (error) {
         message.value = error.message || 'Erreur de connexion';
         isError.value = true;
@@ -70,49 +58,58 @@ const submitLogin = async () => {
 .login-form {
     max-width: 400px;
     margin: 0 auto;
-    padding: 1rem;
+    padding: 20px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 15px;
 }
 
-.form-group label {
+label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 5px;
+    font-weight: bold;
 }
 
-.form-group input {
+input[type="text"],
+input[type="password"] {
     width: 100%;
-    padding: 0.5rem;
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
+    box-sizing: border-box;
 }
 
-button {
+.submit-button {
     width: 100%;
-    padding: 0.75rem;
+    padding: 10px;
     background-color: #007bff;
-    color: #fff;
+    color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
 }
 
-button:hover {
+.submit-button:hover {
     background-color: #0056b3;
 }
 
 .message {
-    margin-top: 1rem;
-    padding: 0.75rem;
-    border-radius: 4px;
+    text-align: center;
+    margin-top: 20px;
 }
 
 .error {
-    background-color: #f8d7da;
-    color: #721c24;
+    color: red;
 }
 </style>

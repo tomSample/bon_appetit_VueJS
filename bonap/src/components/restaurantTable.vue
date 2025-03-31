@@ -1,3 +1,9 @@
+<!-- 
+restaurantTable.vue :
+Ce composant affiche une table des restaurants associés à un utilisateur. 
+Il permet de rechercher, modifier ou supprimer des restaurants, et inclut des liens pour accéder aux détails de chaque restaurant.
+-->
+
 <template>
     <div class="grid__item__view">
         <div class="search" id="man__search" data-category="restaurant">
@@ -17,10 +23,15 @@
             </thead>
             <tbody>
                 <tr v-for="restaurant in restaurants" :key="restaurant.id">
-                    <td><a target="_blank" href="#">{{ restaurant.name }}</a></td>
-                    <td>{{ restaurant.city }}</td>
+                    <!-- Utilisation de RouterLink pour rediriger vers la page du restaurant -->
+                    <td>
+                        <RouterLink :to="{ name: 'restaurant', params: { id: restaurant.id } }">
+                            {{ restaurant.nom }}
+                        </RouterLink>
+                    </td>
+                    <td>{{ restaurant.adresse?.villes[0]?.nom }}</td>
                     <td><img class="change__icon" src="../../src/img/icon/order.png"></td>
-                    <td><img class="change__icon" src="../../src/img/icon/cutlery.png"></td>
+                    <td>{{ restaurant.nombreCouvert }}</td>
                     <td><img class="change__icon" src="../../src/img/icon/editing.png"></td>
                     <td><img class="change__icon" src="../../src/img/icon/delete.png"></td>
                 </tr>
@@ -31,12 +42,22 @@
 
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue';
+import { useAuthStore } from '@/stores/auth';
 
-const restaurants = ref([
-    { id: 1, name: 'Aux plaisirs gustatifs', city: 'Lannion' },
-    { id: 2, name: 'Mangez-nous', city: 'Saint-Jacques-en-champagne' },
-    { id: 3, name: 'La bonne fourchette', city: 'Lannion' },
-]);
+const restaurants = ref([]);
+const authStore = useAuthStore();
+
+const fetchRestaurants = async () => {
+    try {
+        const response = await fetch(`http://localhost:8080/api/restaurants/by-user/${authStore.userId}`);
+        if (!response.ok) {
+            throw new Error('Erreur lors de la récupération des restaurants.');
+        }
+        restaurants.value = await response.json();
+    } catch (error) {
+        console.error(error.message);
+    }
+};
 
 const initializeDataTable = () => {
     $('#restaurantsTable').DataTable();
@@ -48,7 +69,8 @@ const destroyDataTable = () => {
     }
 };
 
-onMounted(() => {
+onMounted(async () => {
+    await fetchRestaurants();
     initializeDataTable();
 });
 

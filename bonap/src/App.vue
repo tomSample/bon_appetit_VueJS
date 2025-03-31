@@ -1,5 +1,13 @@
+<!-- 
+App.vue : 
+Ce composant principal gère la structure globale de l'application
+incluant l'en-tête (navBar), le pied de page (foot), et le contenu principal (RouterView). 
+Il intègre également un panier latéral (cart-sidebar) qui peut être affiché ou masqué,
+et utilise Vue Router pour la navigation entre les pages.
+-->
+
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { RouterView } from 'vue-router';
 import navBar from '@/components/navBar.vue';
 import foot from '@/components/foot.vue';
@@ -15,13 +23,15 @@ const toggleCart = () => {
 
 const isLoggedIn = computed(() => authStore.isLoggedIn);
 const userRole = computed(() => authStore.userRole);
+const userId = computed(() => authStore.userId);
 
-// debug
-
-console.log('isLoggedIn :', isLoggedIn.value);
-console.log('userRole :', userRole.value);
-console.log('token:', authStore.token)
-
+onMounted(() => {
+  // Debug
+  console.log('isLoggedIn:', isLoggedIn.value);
+  console.log('userRole:', userRole.value);
+  console.log('userId:', userId.value);
+  console.log('token:', authStore.token);
+});
 </script>
 
 <template>

@@ -1,3 +1,10 @@
+<!-- 
+Checkout.vue :
+Cette vue gère le processus de commande et de paiement. 
+Elle permet aux utilisateurs de sélectionner une adresse de livraison, un mode de paiement, 
+et de voir un récapitulatif de leur commande avant de confirmer et payer.
+-->
+
 <template>
     <section class="checkout-body">
         <div class="checkout-container-left">

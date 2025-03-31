@@ -1,3 +1,10 @@
+<!-- 
+MyAccount.vue :
+Cette vue permet aux utilisateurs de gérer leur profil, y compris leurs informations personnelles, 
+leurs adresses, leurs moyens de paiement, et leurs préférences de notification. 
+Elle inclut également une option pour supprimer le compte.
+-->
+
 <template>
     <section id="profile" class="fields">
         <div class="container" id="page__title">

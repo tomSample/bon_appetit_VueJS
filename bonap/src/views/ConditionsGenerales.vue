@@ -1,3 +1,10 @@
+<!-- 
+ConditionsGenerales.vue :
+Cette vue affiche les conditions générales d'utilisation du site. 
+Elle inclut des informations sur les services proposés, les responsabilités, 
+et les droits des utilisateurs.
+-->
+
 <template>
     <section class="ConditionsGeneralesHeroBanner">
             <div class="ConditionsGeneralesContainer1">
