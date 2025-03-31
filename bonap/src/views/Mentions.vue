@@ -15,10 +15,10 @@ les droits d'auteur, et les sources des images utilisées.
                     <div class="textmention">MAIL NUMBER</div>
                     <br>
                     <div class="textmention">Yannick Gras</div>
-                    <div class="textmention">pro@ygras.fr NUMBER</div>
+                    <div class="textmention">MAIL NUMBER</div>
                     <br>
                     <div class="textmention">Mathis Fossard</div>
-                    <div class="textmention">mathisfossard22@gmail.com 0766393865</div>
+                    <div class="textmention">MAIL NUMBER</div>
                 </section>
                 <section class="sectionmentions2">
                     <div class="titresectionmention">Mentions légales</div>
