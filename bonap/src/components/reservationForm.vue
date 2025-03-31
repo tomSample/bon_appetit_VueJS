@@ -72,6 +72,11 @@ const route = useRoute();
 // Set the restaurant ID from the route parameter
 onMounted(() => {
     reservation.value.restaurantId = parseInt(route.params.id, 10);
+    console.log('Restaurant ID récupéré depuis la route :', reservation.value.restaurantId);
+
+    // Simulez la récupération de l'utilisateur connecté (remplacez par votre logique réelle)
+    reservation.value.utilisateurId = 27; // Exemple d'ID utilisateur
+    console.log('Utilisateur ID défini :', reservation.value.utilisateurId);
 });
 
 // Method to submit the reservation
@@ -80,11 +85,13 @@ const submitReservation = async () => {
     const dateTime = `${reservation.value.date}T${reservation.value.hour}:${reservation.value.minute}:00Z`;
 
     const reservationData = {
-        dateTime, // Utilisez "dateTime" au lieu de "date" et "time"
+        dateTime,
         nbPersonne: reservation.value.guests,
         restaurant: { id: reservation.value.restaurantId },
         utilisateur: { id: reservation.value.utilisateurId }
     };
+
+    console.log('Données envoyées pour la réservation :', reservationData);
 
     try {
         const response = await fetch('http://localhost:8080/api/reservations', {
@@ -105,11 +112,11 @@ const submitReservation = async () => {
         const data = await response.json();
         message.value = 'Réservation confirmée !';
         isError.value = false;
-        console.log('Réservation confirmée:', data);
+        console.log('Réservation confirmée :', data);
     } catch (error) {
         message.value = error.message || 'Erreur lors de la réservation.';
         isError.value = true;
-        console.error('Error during reservation:', error);
+        console.error('Erreur lors de la réservation :', error);
     }
 };
 </script>
