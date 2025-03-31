@@ -1,3 +1,10 @@
+<!-- 
+foot.vue :
+Ce composant représente le pied de page de l'application. 
+Il affiche des liens vers des pages importantes comme les mentions légales, les conditions générales, et la page "À propos". 
+Le contenu du pied de page varie en fonction du rôle de l'utilisateur (admin, propriétaire, invité).
+-->
+
 <template>
     <footer>
         <p>© 2023 Bon Appétit. Tous droits réservés.</p>

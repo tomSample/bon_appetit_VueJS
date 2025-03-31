@@ -1,4 +1,8 @@
-<!-- itemRestaurant.vue est injecté dans la page Home.vue -->
+<!-- 
+itemRestaurant.vue :
+Ce composant affiche un aperçu d'un restaurant, incluant son nom, sa description, et une photo. 
+Il est utilisé dans des listes de restaurants, comme sur la page d'accueil.
+-->
 
 <template>
     <div class="restaurant-item">

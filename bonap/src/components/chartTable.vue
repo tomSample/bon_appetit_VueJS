@@ -1,3 +1,9 @@
+<!-- 
+chartTable.vue :
+Ce composant affiche un graphique interactif représentant les statistiques d'un restaurant, 
+comme le nombre de clients par mois. Il utilise la bibliothèque CanvasJS pour le rendu du graphique.
+-->
+
 <template>
     <div id="chartContainer" style="height: 370px; width: 100%;"></div>
 </template>

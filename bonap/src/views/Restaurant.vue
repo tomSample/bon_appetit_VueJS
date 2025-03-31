@@ -1,4 +1,8 @@
-<!-- Restaurant.vue est la page correspondant à 1 restaurant sélectionné par l'user -->
+<!-- 
+Restaurant.vue :
+Cette vue affiche les détails d'un restaurant sélectionné, y compris son nom, sa description, 
+et les plats proposés. Elle inclut également un formulaire de réservation.
+-->
 <template>
     <div v-if="restaurant">
         <!-- Afficher le nom et la description du restaurant -->

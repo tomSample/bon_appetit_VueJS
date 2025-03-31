@@ -1,3 +1,9 @@
+<!-- 
+ownerCreateArticle.vue :
+Ce composant permet aux propriétaires de créer un nouvel article (plat, boisson, dessert) pour leur restaurant. 
+Il collecte des informations comme le nom, la description, le prix, et l'image de l'article.
+-->
+
 <!-- <template>
     <div class="create-article-form">
         <h2>Créer un Article</h2>

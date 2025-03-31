@@ -1,3 +1,9 @@
+<!-- 
+clientTable.vue :
+Ce composant affiche une table des clients avec leurs informations (nom, email, téléphone, adresse). 
+Il permet également de rechercher, modifier ou supprimer des clients.
+-->
+
 <template>
     <div class="grid__item__view">
         <div class="search" id="man__search" data-category="client">

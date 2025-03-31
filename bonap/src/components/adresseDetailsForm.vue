@@ -1,3 +1,10 @@
+<!-- 
+adresseDetailsForm.vue :
+Ce composant permet de rechercher et de valider une adresse complète (numéro, rue, code postal, ville). 
+Il utilise des API (api-adresse.data.gouv) pour suggérer des rues et des villes en fonction des entrées utilisateur, 
+et émet un événement avec l'adresse sélectionnée.
+-->
+
 <template>
     <div class="form-section">
         <h2>Rechercher une Adresse</h2>

@@ -1,3 +1,11 @@
+<!-- 
+App.vue : 
+Ce composant principal gère la structure globale de l'application
+incluant l'en-tête (navBar), le pied de page (foot), et le contenu principal (RouterView). 
+Il intègre également un panier latéral (cart-sidebar) qui peut être affiché ou masqué,
+et utilise Vue Router pour la navigation entre les pages.
+-->
+
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { RouterView } from 'vue-router';

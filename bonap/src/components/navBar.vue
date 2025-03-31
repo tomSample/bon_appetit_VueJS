@@ -1,3 +1,10 @@
+<!-- 
+navBar.vue :
+Ce composant représente la barre de navigation principale de l'application. 
+Il affiche des liens vers différentes pages en fonction du rôle de l'utilisateur (client, admin, propriétaire, livreur). 
+Il inclut également un bouton pour afficher le panier.
+-->
+
 <template>
     <header>
         <nav class="nav-bar">

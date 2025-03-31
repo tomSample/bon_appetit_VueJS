@@ -1,3 +1,9 @@
+<!-- 
+OwnerDashboard.vue :
+Cette vue sert de tableau de bord pour les propriétaires. 
+Elle leur permet de gérer leurs restaurants, leurs clients, et d'accéder à des rapports et statistiques.
+-->
+
 <template>
     <!-- ===nav left=== -->
     <div class="container" id="views">

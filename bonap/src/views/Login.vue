@@ -1,3 +1,9 @@
+<!-- 
+Login.vue :
+Cette vue permet aux utilisateurs de se connecter à leur compte en saisissant leur login et mot de passe. 
+Elle gère également les erreurs de connexion et redirige les utilisateurs après une connexion réussie.
+-->
+
 <template>
     <div class="login-form">
         <h2>Connexion</h2>

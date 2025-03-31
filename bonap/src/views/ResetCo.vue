@@ -1,3 +1,9 @@
+<!-- 
+ResetCo.vue :
+Cette vue permet aux utilisateurs de réinitialiser leur mot de passe ou de retrouver leur login 
+en saisissant leur adresse email. Elle vérifie l'existence de l'email via l'API.
+-->
+
 <template>
     <div class="reset-co-form">
         <h1>Réinitialiser le mot de passe / Retrouver le login</h1>

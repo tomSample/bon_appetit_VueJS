@@ -1,3 +1,9 @@
+<!-- 
+villeDetailsForm.vue :
+Ce composant permet de rechercher et de valider une ville en fonction de son nom ou de son code postal. 
+Il utilise une API (geo.api.gouv) pour suggérer des villes et émet un événement avec la ville sélectionnée.
+-->
+
 <template>
   <div class="form-section">
     <h2>Rechercher une Ville</h2>
@@ -38,6 +44,7 @@ const villeId = ref(null);
 
 const emit = defineEmits(['city-selected']);
 
+// Fonction pour valider une ville
 const validateCity = async () => {
   try {
     const response = await fetch(`https://geo.api.gouv.fr/communes?nom=${cityName.value}&codePostal=${postalCode.value}&fields=nom,codesPostaux&format=json`);

@@ -1,3 +1,10 @@
+<!-- 
+reservationForm.vue :
+Ce composant permet aux utilisateurs de réserver une table dans un restaurant. 
+Il collecte des informations comme la date, l'heure, et le nombre de convives, 
+et envoie ces données à l'API pour créer une réservation.
+-->
+
 <template>
     <div class="reservation-form">
         <h2>Réserver une table</h2>
@@ -69,15 +76,16 @@ onMounted(() => {
 
 // Method to submit the reservation
 const submitReservation = async () => {
-    // Combine the hour and minute into a single string in HH:mm format
-    const time = `${reservation.value.hour}:${reservation.value.minute}`;
+    // Combine la date et l'heure en un seul champ au format ISO 8601
+    const dateTime = `${reservation.value.date}T${reservation.value.hour}:${reservation.value.minute}:00Z`;
+
     const reservationData = {
-        date: reservation.value.date,
-        time,
+        dateTime, // Utilisez "dateTime" au lieu de "date" et "time"
         nbPersonne: reservation.value.guests,
         restaurant: { id: reservation.value.restaurantId },
         utilisateur: { id: reservation.value.utilisateurId }
     };
+
     try {
         const response = await fetch('http://localhost:8080/api/reservations', {
             method: 'POST',
@@ -86,12 +94,14 @@ const submitReservation = async () => {
             },
             body: JSON.stringify(reservationData)
         });
+
         if (!response.ok) {
             if (response.status === 403) {
                 throw new Error('Vous n\'êtes pas autorisé à effectuer cette action.');
             }
             throw new Error('Network response was not ok');
         }
+
         const data = await response.json();
         message.value = 'Réservation confirmée !';
         isError.value = false;

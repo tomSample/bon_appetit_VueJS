@@ -1,3 +1,10 @@
+<!-- 
+OwnerCreateRestaurant.vue :
+Cette vue permet aux propriétaires de créer un nouveau restaurant en remplissant un formulaire. 
+Elle collecte des informations sur le restaurant, telles que le nom, l'adresse, et la capacité, 
+et envoie ces données à l'API pour les enregistrer.
+-->
+
 <template>
     <div class="create-restaurant-form">
         <h2>Créer un Restaurant</h2>

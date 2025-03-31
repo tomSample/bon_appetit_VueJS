@@ -1,3 +1,9 @@
+<!-- 
+restaurantDetailsForm.vue :
+Ce composant affiche un formulaire pour saisir ou modifier les détails d'un restaurant, 
+comme le nom, le SIRET, la capacité, le téléphone, et la description.
+-->
+
 <template>
     <div class="form-section">
         <div class="form-group">

@@ -1,3 +1,9 @@
+<!-- 
+heroSearch.vue :
+Ce composant affiche une barre de recherche sur la page d'accueil. 
+Il permet de rechercher des restaurants par ville et émet un événement avec les résultats de la recherche.
+-->
+
 <template>
     <div class="hero-search">
         <h1>Bienvenue sur Bon Appétit !</h1>

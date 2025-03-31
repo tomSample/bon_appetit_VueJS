@@ -1,3 +1,10 @@
+<!-- 
+SignUp.vue :
+Cette vue permet aux utilisateurs de créer un compte en remplissant un formulaire d'inscription. 
+Elle collecte des informations personnelles telles que le nom, l'email, l'adresse, et le mot de passe, 
+et envoie ces données à l'API pour créer un nouvel utilisateur.
+-->
+
 <template>
     <div class="signup-container">
         <h2>Sign Up</h2>
