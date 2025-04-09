@@ -13,7 +13,7 @@
                     </div>
                     <div class="resto-id-specs">
                         <input v-model="restaurant.hours" type="text" placeholder="Horaires d'ouverture">
-                        <input v-model="restaurant.orderTime" type="text" placeholder="Délai préparation commande">
+                        <input v-model="restaurant.orderTime" type="text" placeholder="Délai préparation de commande">
                     </div>
                 </div>
             </div>
