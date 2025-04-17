@@ -1,9 +1,3 @@
-<!-- 
-Login.vue :
-Cette vue permet aux utilisateurs de se connecter à leur compte en saisissant leur login et mot de passe. 
-Elle gère également les erreurs de connexion et redirige les utilisateurs après une connexion réussie.
--->
-
 <template>
     <div class="login-form">
         <h2>Connexion</h2>
@@ -18,6 +12,18 @@ Elle gère également les erreurs de connexion et redirige les utilisateurs apr�
             </div>
             <button type="submit" class="submit-button">Se connecter</button>
         </form>
+
+        <div v-if="otpRequired">
+            <h3>Saisissez votre OTP</h3>
+            <form @submit.prevent="submitOTP">
+                <div class="form-group">
+                    <label for="otp">OTP :</label>
+                    <input type="text" id="otp" v-model="otp" required />
+                </div>
+                <button type="submit" class="submit-button">Vérifier OTP</button>
+            </form>
+        </div>
+
         <p>
             <router-link to="/reset-co">Mot de passe oublié ?</router-link>
         </p>
@@ -30,25 +36,68 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
-const authStore = useAuthStore();
 const router = useRouter();
+const authStore = useAuthStore();
 
 const loginData = ref({
     username: '',
     password: ''
 });
 
+const otp = ref('');
+const otpRequired = ref(false);
 const message = ref('');
 const isError = ref(false);
 
 const submitLogin = async () => {
     try {
-        await authStore.login(loginData.value.username, loginData.value.password);
+        // Appeler l'API pour vérifier le login et générer l'OTP
+        const response = await fetch(`http://localhost:8080/api/connexions/login?login=${loginData.value.username}&password=${loginData.value.password}`, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        // Si la connexion est réussie, demander l'OTP
+        const responseData = await response.text();
+        message.value = responseData; // optionnel
+        isError.value = false;
+        otpRequired.value = true; // Afficher le champ OTP
+    } catch (error) {
+        // Gérer les erreurs de connexion
+        message.value = error.message || 'Erreur de connexion';
+        isError.value = true;
+    }
+};
+
+const submitOTP = async () => {
+    try {
+        // Appeler l'API pour vérifier l'OTP
+        const response = await fetch(`http://localhost:8080/api/connexions/verify-otp?login=${loginData.value.username}&otp=${otp.value}`, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        // Si l'OTP est valide, connecter l'utilisateur
+        const responseData = await response.text();
+        message.value = responseData; // Le message "OTP vérifié avec succès."
+        isError.value = false;
+
+        // Appeler l'API pour finaliser la connexion
+        await authStore.login(loginData.value.username, loginData.value.password); // Mettre à jour l'état de connexion
         message.value = 'Connexion réussie';
         isError.value = false;
-        router.push('/'); // Rediriger vers la page d'accueil ou une autre page après la connexion réussie
+
+        // Rediriger l'utilisateur
+        router.push('/'); // Exemple de redirection vers un tableau de bord
     } catch (error) {
-        message.value = error.message || 'Erreur de connexion';
+        // Gérer les erreurs de vérification de l'OTP ou de connexion
+        message.value = error.message || 'Erreur lors de la vérification de l’OTP ou de la connexion';
         isError.value = true;
     }
 };
