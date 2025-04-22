@@ -10,6 +10,7 @@ import ResetCo from '@/views/ResetCo.vue'
 import Checkout from '@/views/Checkout.vue'
 import OwnerCreateRestaurant from '@/views/OwnerCreateRestaurant.vue'
 import OwnerDashboard from '@/views/OwnerDashboard.vue'
+import OwnerCreateArticle from '@/views/OwnerCreateArticle.vue'
 import MyAccount from '@/views/MyAccount.vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -86,6 +87,14 @@ const router = createRouter({
       component: OwnerDashboard,
       meta: { requiresAuth: true, role: 'owner' },
     },
+
+    {
+      path: '/owner/create-article',
+      name: 'owner-create-article',
+      component: OwnerCreateArticle,
+      meta: { requiresAuth: true, role: 'owner' },
+    },
+
     {
       path: '/my-account',
       name: 'my-account',

@@ -73,10 +73,6 @@ const route = useRoute();
 onMounted(() => {
     reservation.value.restaurantId = parseInt(route.params.id, 10);
     console.log('Restaurant ID récupéré depuis la route :', reservation.value.restaurantId);
-
-    // Simulez la récupération de l'utilisateur connecté (remplacez par votre logique réelle)
-    reservation.value.utilisateurId = 27; // Exemple d'ID utilisateur
-    console.log('Utilisateur ID défini :', reservation.value.utilisateurId);
 });
 
 // Method to submit the reservation
