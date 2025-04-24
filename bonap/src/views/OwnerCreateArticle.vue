@@ -1,9 +1,3 @@
-<!-- 
-ownerCreateArticle.vue :
-Ce composant permet aux propriétaires de créer un nouvel article (plat, boisson, dessert) pour leur restaurant. 
-Il collecte des informations comme le nom, la description, le prix, et l'image de l'article.
--->
-
 <template>
   <div class="create-article">
     <h1>Créer un nouvel article</h1>
@@ -18,7 +12,7 @@ Il collecte des informations comme le nom, la description, le prix, et l'image d
       </div>
       <div>
         <label for="prix">Prix:</label>
-        <input type="number" id="prix" v-model="article.prix" required />
+        <input type="number" id="prix" v-model="article.prix" step="0.01" required />
       </div>
       <div>
         <label for="image">Image (URL):</label>
@@ -36,20 +30,26 @@ Il collecte des informations comme le nom, la description, le prix, et l'image d
         <label for="duree">Durée (en minutes):</label>
         <input type="number" id="duree" v-model="article.duree" />
       </div>
+      <div>
+        <label for="typeArticle">Type d'article:</label>
+        <select id="typeArticle" v-model="article.typeArticleId" required>
+          <option v-for="type in typeArticles" :key="type.id" :value="type.id">
+            {{ type.nom }}
+          </option>
+        </select>
+      </div>
       <button type="submit">Créer l'article</button>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
-// Retrieve the restaurantId from the route
 const route = useRoute();
 const restaurantId = Number(route.params.restaurantId);
 
-// Article object matching the backend model
 const article = ref({
   nom: '',
   description: '',
@@ -58,10 +58,26 @@ const article = ref({
   poids: null,
   stock: null,
   duree: null,
-  restaurantId: restaurantId, // Automatically associate with the restaurant from the route
+  restaurantId: restaurantId,
+  typeArticleId: null, // ID du type d'article sélectionné
 });
 
-// Submit the article to the backend
+const typeArticles = ref([]); // Liste des types d'articles
+
+// Récupérer les types d'articles depuis l'API
+const fetchTypeArticles = async () => {
+  try {
+    const response = await fetch('http://localhost:8080/api/type-articles');
+    if (!response.ok) {
+      throw new Error('Erreur lors de la récupération des types d\'articles');
+    }
+    typeArticles.value = await response.json();
+  } catch (error) {
+    console.error('Erreur lors de la récupération des types d\'articles :', error);
+  }
+};
+
+// Soumettre l'article au backend
 const submitArticle = async () => {
   try {
     const response = await fetch('http://localhost:8080/api/articles', {
@@ -72,10 +88,9 @@ const submitArticle = async () => {
       body: JSON.stringify(article.value),
     });
     if (!response.ok) {
-      throw new Error('Failed to create article');
+      throw new Error('Erreur lors de la création de l\'article');
     }
     alert('Article créé avec succès!');
-    // Reset the form while keeping the restaurantId
     article.value = {
       nom: '',
       description: '',
@@ -85,12 +100,17 @@ const submitArticle = async () => {
       stock: null,
       duree: null,
       restaurantId: restaurantId,
+      typeArticleId: null,
     };
   } catch (error) {
-    console.error('Error creating article:', error);
+    console.error('Erreur lors de la création de l\'article :', error);
     alert('Erreur lors de la création de l\'article.');
   }
 };
+
+onMounted(() => {
+  fetchTypeArticles();
+});
 </script>
 
 <style scoped>
@@ -110,7 +130,8 @@ label {
 }
 
 input,
-textarea {
+textarea,
+select {
   width: 100%;
   padding: 0.5rem;
   font-size: 1rem;
