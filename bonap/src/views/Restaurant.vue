@@ -14,7 +14,10 @@ et les plats proposés. Elle inclut également un formulaire de réservation.
 
         <!-- Afficher les plats proposés par le restaurant organisés par type -->
         <div class="articles-by-type">
-            <itemProduitByType :restaurant-id="restaurant.id" />
+            <itemProduitByType 
+                :restaurant-id="restaurant.id" 
+                :is-owner-of-restaurant="isOwnerOfRestaurant" 
+            />
         </div>
 
         <!-- Afficher le formulaire de réservation (collapsible) -->
@@ -34,7 +37,6 @@ et les plats proposés. Elle inclut également un formulaire de réservation.
                 <button class="action-button">Créer un nouvel article</button>
             </router-link>
         </div>
-
     </div>
     <div v-else>
         <p>Loading...</p>
