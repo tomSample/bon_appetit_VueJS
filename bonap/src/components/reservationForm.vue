@@ -38,6 +38,7 @@ et envoie ces données à l'API pour créer une réservation.
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 // Function to get the current date in YYYY-MM-DD format
 const getCurrentDate = () => {
@@ -48,6 +49,9 @@ const getCurrentDate = () => {
     return `${year}-${month}-${day}`;
 };
 
+// Access the auth store to get the user ID
+const authStore = useAuthStore();
+
 // Define the reservation object with default values
 const reservation = ref({
     date: getCurrentDate(), // Default current date
@@ -55,7 +59,7 @@ const reservation = ref({
     minute: '00', // Default minute
     guests: 1,
     restaurantId: null, // Default restaurant ID (will be set dynamically)
-    utilisateurId: 1 // Default user ID (replace with actual value)
+    utilisateurId: authStore.userId
 });
 
 // List of hours and minutes for the selectors
