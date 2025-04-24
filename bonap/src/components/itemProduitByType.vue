@@ -132,18 +132,36 @@ const disableEditing = () => {
 // Mettre à jour l'article
 const updateArticle = async () => {
     try {
+        // Supprimez typeArticleId si ce champ n'est pas nécessaire
+        const articleToUpdate = { ...selectedArticle.value };
+        delete articleToUpdate.typeArticleId;
+
         const response = await fetch(`http://localhost:8080/api/articles/${props.restaurantId}/${selectedArticle.value.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(selectedArticle.value),
+            body: JSON.stringify(articleToUpdate),
         });
+
         if (!response.ok) {
             throw new Error('Erreur lors de la mise à jour de l\'article');
         }
+
         alert('Article mis à jour avec succès');
+
+        // Mettre à jour les données localement
+        const typeId = selectedArticle.value.typeArticleId;
+        if (articlesByType.value[typeId]) {
+            const index = articlesByType.value[typeId].findIndex(article => article.id === selectedArticle.value.id);
+            if (index !== -1) {
+                articlesByType.value[typeId][index] = { ...selectedArticle.value };
+            }
+        }
+
+        // Fermer le modal
         closeModal();
     } catch (error) {
         console.error('Erreur lors de la mise à jour de l\'article :', error);
+        alert('Erreur lors de la mise à jour de l\'article.');
     }
 };
 
@@ -180,6 +198,7 @@ const fetchArticlesByType = async (typeId: number) => {
         console.error(`Erreur lors de la récupération des articles pour le type ${typeId} :`, error);
     }
 };
+
 
 // Charger les données au montage du composant
 onMounted(async () => {
