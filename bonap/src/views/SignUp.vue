@@ -66,7 +66,7 @@ et envoie ces données à l'API pour créer un nouvel utilisateur.
     </div>
 </template>
 
-<script setup>
+<script>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';

@@ -119,7 +119,7 @@ et les droits des utilisateurs.
                 </section>
 </template>
 
-<script>
+<script setup lang="ts">
 </script>
 
 <style scoped>

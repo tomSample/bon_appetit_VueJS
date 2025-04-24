@@ -12,6 +12,7 @@ import OwnerCreateRestaurant from '@/views/OwnerCreateRestaurant.vue'
 import OwnerDashboard from '@/views/OwnerDashboard.vue'
 import MyAccount from '@/views/MyAccount.vue'
 import { useAuthStore } from '@/stores/auth'
+import ItemProduitByType from '@/components/itemProduitByType.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -79,6 +80,11 @@ const router = createRouter({
       name: 'owner-create',
       component: OwnerCreateRestaurant,
       meta: { requiresAuth: true, role: 'owner' },
+    },
+    {
+      path: '/owner/item',
+      name: 'item-create',
+      component: ItemProduitByType,
     },
     {
       path: '/owner/dashboard',

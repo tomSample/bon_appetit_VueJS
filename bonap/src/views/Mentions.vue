@@ -43,7 +43,7 @@ les droits d'auteur, et les sources des images utilisées.
     </section>
 </template>
 
-<script>
+<script setup lang="ts">
 </script>
 
 <style scoped>
