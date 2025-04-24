@@ -15,8 +15,9 @@ et les plats proposés. Elle inclut également un formulaire de réservation.
         <reservationForm />
 
         <!-- Bouton pour accéder à la création d'article (visible uniquement si l'utilisateur est le propriétaire) -->
-        <router-link v-if="isOwnerOfRestaurant" :to="{ name: 'owner-create-article' }">
-            <button>Ajouter un nouvel article</button>
+        <router-link v-if="isOwnerOfRestaurant"
+            :to="{ name: 'owner-create-article', params: { restaurantId: restaurant.id } }">
+            <button>Créer un nouvel article</button>
         </router-link>
 
         <!-- Afficher les plats proposés par le restaurant -->
@@ -62,11 +63,11 @@ const fetchRestaurantDetails = async (id: number) => {
         // Affecter les données récupérées (data) à la variable restaurant
         restaurant.value = data;
 
-// Log the restaurant's utilisateur_id
-console.log('Restaurant Utilisateur ID:', restaurant.value?.utilisateur?.id);
+        // Log the restaurant's utilisateur_id
+        console.log('Restaurant Utilisateur ID:', restaurant.value?.utilisateur?.id);
 
-// Log the utilisateur ID from the auth store
-console.log('Utilisateur ID from Auth Store:', authStore.userId);
+        // Log the utilisateur ID from the auth store
+        console.log('Utilisateur ID from Auth Store:', authStore.userId);
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
     }
