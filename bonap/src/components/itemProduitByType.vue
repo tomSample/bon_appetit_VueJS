@@ -26,59 +26,62 @@
             <p>Chargement des types d'articles...</p>
         </div>
 
-        <!-- Modal -->
-        <div v-if="selectedArticle" class="modal-overlay" @click.self="closeModal">
-            <div class="modal-content">
-                <button class="close-button" @click="closeModal">&times;</button>
-                <img :src="selectedArticle.image || 'placeholder.jpg'" alt="Image de l'article" class="modal-image" />
+<!-- Modal -->
+<div v-if="selectedArticle" class="modal-overlay" @click.self="closeModal">
+    <div class="modal-content">
+        <button class="close-button" @click="closeModal">&times;</button>
+        <img :src="selectedArticle.image || 'placeholder.jpg'" alt="Image de l'article" class="modal-image" />
 
-                <!-- Affichage pour tous les utilisateurs -->
-                <h2 class="modal-title">{{ capitalizeFirstLetter(selectedArticle.nom) }}</h2>
-                <p class="modal-description">{{ selectedArticle.description }}</p>
-                <p class="modal-price">Prix : {{ selectedArticle.prix }} €</p>
-                <p class="modal-weight">Poids : {{ selectedArticle.poids }} g</p>
-
-                <!-- Affichage et modification pour le propriétaire -->
-                <div v-if="isOwnerOfRestaurant">
-                    <h3>Modifier les informations de l'article</h3>
-                    <button v-if="!isEditing" @click="enableEditing" class="edit-button">Modifier</button>
-                    <form v-if="isEditing" @submit.prevent="updateArticle" class="modal-form">
-                        <div class="form-group">
-                            <label for="nom">Nom :</label>
-                            <input id="nom" v-model="selectedArticle.nom" type="text" class="form-input" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="description">Description :</label>
-                            <textarea id="description" v-model="selectedArticle.description" class="form-input" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="prix">Prix :</label>
-                            <input id="prix" v-model.number="selectedArticle.prix" type="number" step="0.01" class="form-input" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="poids">Poids :</label>
-                            <input id="poids" v-model.number="selectedArticle.poids" type="number" class="form-input" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="stock">Stock :</label>
-                            <input id="stock" v-model.number="selectedArticle.stock" type="number" class="form-input" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="duree">Durée :</label>
-                            <input id="duree" v-model.number="selectedArticle.duree" type="number" class="form-input" />
-                        </div>
-                        <div class="form-group">
-                            <label for="image">Image URL :</label>
-                            <input id="image" v-model="selectedArticle.image" type="text" class="form-input" />
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="save-button">Enregistrer</button>
-                            <button type="button" @click="disableEditing" class="cancel-button">Annuler</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        <!-- Affichage des informations ou des champs de formulaire -->
+        <div v-if="!isEditing">
+            <h2 class="modal-title">{{ capitalizeFirstLetter(selectedArticle.nom) }}</h2>
+            <p class="modal-description">{{ selectedArticle.description }}</p>
+            <p class="modal-price">Prix : {{ selectedArticle.prix }} €</p>
+            <p class="modal-weight">Poids : {{ selectedArticle.poids }} g</p>
         </div>
+
+        <!-- Formulaire d'édition -->
+        <form v-else @submit.prevent="updateArticle" class="modal-form">
+            <div class="form-group">
+                <label for="nom">Nom :</label>
+                <input id="nom" v-model="selectedArticle.nom" type="text" class="form-input" required />
+            </div>
+            <div class="form-group">
+                <label for="description">Description :</label>
+                <textarea id="description" v-model="selectedArticle.description" class="form-input" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="prix">Prix :</label>
+                <input id="prix" v-model.number="selectedArticle.prix" type="number" step="0.01" class="form-input" required />
+            </div>
+            <div class="form-group">
+                <label for="poids">Poids :</label>
+                <input id="poids" v-model.number="selectedArticle.poids" type="number" class="form-input" required />
+            </div>
+            <div class="form-group">
+                <label for="stock">Stock :</label>
+                <input id="stock" v-model.number="selectedArticle.stock" type="number" class="form-input" required />
+            </div>
+            <div class="form-group">
+                <label for="duree">Durée :</label>
+                <input id="duree" v-model.number="selectedArticle.duree" type="number" class="form-input" />
+            </div>
+            <div class="form-group">
+                <label for="image">Image URL :</label>
+                <input id="image" v-model="selectedArticle.image" type="text" class="form-input" />
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="save-button">Enregistrer</button>
+                <button type="button" @click="disableEditing" class="cancel-button">Annuler</button>
+            </div>
+        </form>
+
+        <!-- Bouton pour activer l'édition -->
+        <div v-if="isOwnerOfRestaurant && !isEditing">
+            <button @click="enableEditing" class="edit-button">Modifier</button>
+        </div>
+    </div>
+</div>
     </div>
 </template>
 
