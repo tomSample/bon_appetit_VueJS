@@ -12,6 +12,11 @@ et les plats proposés. Elle inclut également un formulaire de réservation.
         <p>{{ restaurant.description }}</p>
         <p>Ceci est la page du restaurant qui doit afficher les plats proposés</p>
 
+        <!-- Afficher les plats proposés par le restaurant organisés par type -->
+        <div class="articles-by-type">
+            <itemProduitByType :restaurant-id="restaurant.id" />
+        </div>
+
         <!-- Afficher le formulaire de réservation (collapsible) -->
         <div class="reservation-container">
             <button class="toggle-button" @click="toggleReservationForm">
@@ -30,8 +35,6 @@ et les plats proposés. Elle inclut également un formulaire de réservation.
             </router-link>
         </div>
 
-        <!-- Afficher les plats proposés par le restaurant -->
-        <itemProduitByType />
     </div>
     <div v-else>
         <p>Loading...</p>
@@ -44,6 +47,7 @@ import { ref, onMounted, computed } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import reservationForm from '@/components/reservationForm.vue';
+import itemProduitByType from '@/components/itemProduitByType.vue';
 
 const route = useRoute();
 const restaurantId = route.params.id;
