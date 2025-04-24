@@ -29,7 +29,7 @@ et envoie ces données à l'API pour créer une réservation.
                 <label for="guests">Nombre de convives :</label>
                 <input type="number" id="guests" v-model="reservation.guests" min="1" required />
             </div>
-            <button type="submit">Confirmer la réservation</button>
+            <button type="submit" class="action-button">Confirmer la réservation</button>
         </form>
         <div v-if="message" :class="{'message': true, 'error': isError}">{{ message }}</div>
     </div>
@@ -40,7 +40,6 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
-// Function to get the current date in YYYY-MM-DD format
 const getCurrentDate = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -49,39 +48,31 @@ const getCurrentDate = () => {
     return `${year}-${month}-${day}`;
 };
 
-// Access the auth store to get the user ID
 const authStore = useAuthStore();
 
-// Define the reservation object with default values
 const reservation = ref({
-    date: getCurrentDate(), // Default current date
-    hour: '12', // Default hour
-    minute: '00', // Default minute
+    date: getCurrentDate(),
+    hour: '12',
+    minute: '00',
     guests: 1,
-    restaurantId: null, // Default restaurant ID (will be set dynamically)
+    restaurantId: null,
     utilisateurId: authStore.userId
 });
 
-// List of hours and minutes for the selectors
 const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
 const minutes = ['00', '15', '30', '45'];
 
-// Message to display the reservation status
 const message = ref('');
 const isError = ref(false);
 
-// Get the current route
 const route = useRoute();
 
-// Set the restaurant ID from the route parameter
 onMounted(() => {
     reservation.value.restaurantId = parseInt(route.params.id, 10);
     console.log('Restaurant ID récupéré depuis la route :', reservation.value.restaurantId);
 });
 
-// Method to submit the reservation
 const submitReservation = async () => {
-    // Combine la date et l'heure en un seul champ au format ISO 8601
     const dateTime = `${reservation.value.date}T${reservation.value.hour}:${reservation.value.minute}:00Z`;
 
     const reservationData = {
@@ -103,10 +94,7 @@ const submitReservation = async () => {
         });
 
         if (!response.ok) {
-            if (response.status === 403) {
-                throw new Error('Vous n\'êtes pas autorisé à effectuer cette action.');
-            }
-            throw new Error('Network response was not ok');
+            throw new Error('Erreur lors de la réservation.');
         }
 
         const data = await response.json();
@@ -122,6 +110,27 @@ const submitReservation = async () => {
 </script>
 
 <style scoped>
+/* Uniformiser les boutons */
+.action-button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+    background-color: #0056b3;
+}
+
+.action-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
 .reservation-form {
     max-width: 400px;
     margin: 0 auto;
@@ -155,20 +164,6 @@ input, select {
 .time-select select {
     width: auto;
     margin-right: 0.5rem;
-}
-
-button {
-    width: 100%;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 5px;
-    background-color: #333;
-    color: white;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #555;
 }
 
 .message {
