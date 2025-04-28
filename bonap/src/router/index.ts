@@ -11,6 +11,7 @@ import Checkout from '@/views/Checkout.vue'
 import OwnerCreateRestaurant from '@/views/OwnerCreateRestaurant.vue'
 import OwnerDashboard from '@/views/OwnerDashboard.vue'
 import MyAccount from '@/views/MyAccount.vue'
+import ItemsProduitsBy from '@/views/ItemsProduitsBy.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
@@ -83,7 +84,7 @@ const router = createRouter({
     {
       path: '/owner/item',
       name: 'item-create',
-      component: itemProduitBy,
+      component: ItemsProduitsBy,
     },
     {
       path: '/owner/dashboard',
