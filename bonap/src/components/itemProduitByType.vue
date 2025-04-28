@@ -26,181 +26,104 @@
             <p>Chargement des types d'articles...</p>
         </div>
 
-<!-- Modal -->
-<div v-if="selectedArticle" class="modal-overlay" @click.self="closeModal">
-    <div class="modal-content">
-        <button class="close-button" @click="closeModal">&times;</button>
-        <img :src="selectedArticle.image || 'placeholder.jpg'" alt="Image de l'article" class="modal-image" />
+        <!-- Modal -->
+        <div v-if="selectedArticle" class="modal-overlay" @click.self="closeModal">
+            <div class="modal-content">
+                <button class="close-button" @click="closeModal">&times;</button>
+                <img :src="selectedArticle.image || 'placeholder.jpg'" alt="Image de l'article" class="modal-image" />
 
-        <!-- Affichage des informations ou des champs de formulaire -->
-        <div v-if="!isEditing">
-            <h2 class="modal-title">{{ capitalizeFirstLetter(selectedArticle.nom) }}</h2>
-            <p class="modal-description">{{ selectedArticle.description }}</p>
-            <p class="modal-price">Prix : {{ selectedArticle.prix }} €</p>
-            <p class="modal-weight">Poids : {{ selectedArticle.poids }} g</p>
+                <div>
+                    <h2 class="modal-title">{{ capitalizeFirstLetter(selectedArticle.nom) }}</h2>
+                    <p class="modal-description">{{ selectedArticle.description }}</p>
+                    <p class="modal-price">Prix : {{ selectedArticle.prix }} €</p>
+                    <p class="modal-weight">Poids : {{ selectedArticle.poids }} g</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Quantité :</label>
+                    <input id="quantity" v-model.number="modalQuantity" type="number" min="1" class="form-input" />
+                </div>
+                <button @click="addToCartFromModal" class="add-to-cart-button">Ajouter au panier</button>
+            </div>
         </div>
-
-        <!-- Formulaire d'édition -->
-        <form v-else @submit.prevent="updateArticle" class="modal-form">
-            <div class="form-group">
-                <label for="nom">Nom :</label>
-                <input id="nom" v-model="selectedArticle.nom" type="text" class="form-input" required />
-            </div>
-            <div class="form-group">
-                <label for="description">Description :</label>
-                <textarea id="description" v-model="selectedArticle.description" class="form-input" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="prix">Prix :</label>
-                <input id="prix" v-model.number="selectedArticle.prix" type="number" step="0.01" class="form-input" required />
-            </div>
-            <div class="form-group">
-                <label for="poids">Poids :</label>
-                <input id="poids" v-model.number="selectedArticle.poids" type="number" class="form-input" required />
-            </div>
-            <div class="form-group">
-                <label for="stock">Stock :</label>
-                <input id="stock" v-model.number="selectedArticle.stock" type="number" class="form-input" required />
-            </div>
-            <div class="form-group">
-                <label for="duree">Durée :</label>
-                <input id="duree" v-model.number="selectedArticle.duree" type="number" class="form-input" />
-            </div>
-            <div class="form-group">
-                <label for="image">Image URL :</label>
-                <input id="image" v-model="selectedArticle.image" type="text" class="form-input" />
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="save-button">Enregistrer</button>
-                <button type="button" @click="disableEditing" class="cancel-button">Annuler</button>
-            </div>
-        </form>
-
-        <!-- Bouton pour activer l'édition -->
-        <div v-if="isOwnerOfRestaurant && !isEditing">
-            <button @click="enableEditing" class="edit-button">Modifier</button>
-        </div>
-    </div>
-</div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 const props = defineProps({
     restaurantId: Number,
-    isOwnerOfRestaurant: Boolean, // Prop pour vérifier si l'utilisateur est le propriétaire
+    isOwnerOfRestaurant: Boolean,
 });
 
 const route = useRoute();
 
 const typeArticles = ref([]);
 const articlesByType = ref({});
-const selectedArticle = ref(null); // Article sélectionné pour le modal
-const isEditing = ref(false); // État pour activer/désactiver l'édition
+const selectedArticle = ref(null);
+const modalQuantity = ref(1);
+const cart = ref([]); // Panier local
 
-// Fonction pour capitaliser la première lettre d'une chaîne
 const capitalizeFirstLetter = (str: string) => {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-// Ouvrir le modal avec l'article sélectionné
 const openModal = (article: any) => {
-    selectedArticle.value = { ...article }; // Cloner l'article pour éviter les modifications directes
-    isEditing.value = false; // Désactiver l'édition par défaut
+    selectedArticle.value = { ...article };
+    modalQuantity.value = 1;
 };
 
-// Fermer le modal
 const closeModal = () => {
     selectedArticle.value = null;
-    isEditing.value = false; // Réinitialiser l'état d'édition
 };
 
-// Activer l'édition
-const enableEditing = () => {
-    isEditing.value = true;
-};
-
-// Désactiver l'édition
-const disableEditing = () => {
-    isEditing.value = false;
-};
-
-// Mettre à jour l'article
-const updateArticle = async () => {
-    try {
-        // Supprimez typeArticleId si ce champ n'est pas nécessaire
-        const articleToUpdate = { ...selectedArticle.value };
-        delete articleToUpdate.typeArticleId;
-
-        const response = await fetch(`http://localhost:8080/api/articles/${props.restaurantId}/${selectedArticle.value.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(articleToUpdate),
-        });
-
-        if (!response.ok) {
-            throw new Error('Erreur lors de la mise à jour de l\'article');
+const addToCartFromModal = () => {
+    if (modalQuantity.value > 0) {
+        console.log(`Ajout au panier depuis le modal : 
+            ID: ${selectedArticle.value.id}, 
+            Nom: ${selectedArticle.value.nom}, 
+            Prix: ${selectedArticle.value.prix}, 
+            Poids: ${selectedArticle.value.poids}, 
+            Quantité: ${modalQuantity.value}`);
+        const existingItem = cart.value.find((item) => item.id === selectedArticle.value.id);
+        if (existingItem) {
+            existingItem.quantity += modalQuantity.value;
+        } else {
+            cart.value.push({
+                id: selectedArticle.value.id,
+                name: selectedArticle.value.nom,
+                price: selectedArticle.value.prix,
+                quantity: modalQuantity.value,
+            });
         }
-
-        alert('Article mis à jour avec succès');
-
-        // Rafraîchir les articles pour refléter les modifications
-        const typeId = selectedArticle.value.typeArticleId;
-        if (typeId) {
-            await fetchArticlesByType(typeId); // Recharge les articles pour le type correspondant
-        }
-
-        // Fermer le modal
+        alert('Article ajouté au panier !');
         closeModal();
-    } catch (error) {
-        console.error('Erreur lors de la mise à jour de l\'article :', error);
-        alert('Erreur lors de la mise à jour de l\'article.');
+    } else {
+        alert('Veuillez sélectionner une quantité valide.');
     }
 };
 
-// Récupérer les types d'articles
 const fetchTypeArticles = async () => {
-    try {
-        const response = await fetch('http://localhost:8080/api/type-articles');
-        if (!response.ok) {
-            throw new Error('Erreur lors de la récupération des types d\'articles');
-        }
-        typeArticles.value = await response.json();
-    } catch (error) {
-        console.error('Erreur lors de la récupération des types d\'articles :', error);
-    }
+    const response = await fetch('http://localhost:8080/api/type-articles');
+    typeArticles.value = await response.json();
 };
 
-// Récupérer les articles par type
 const fetchArticlesByType = async (typeId: number) => {
-    try {
-        const response = await fetch(`http://localhost:8080/api/articles/restaurant/${props.restaurantId}/type/${typeId}`);
-        if (!response.ok) {
-            throw new Error('Erreur lors de la récupération des articles');
-        }
-        const articles = await response.json();
-        articlesByType.value[typeId] = articles.map((article: any) => ({
-            id: article.id,
-            nom: article.nom,
-            description: article.description,
-            image: article.image, // Inclure l'image
-            prix: article.prix,
-            poids: article.poids,
-            stock: article.stock, // Inclure le stock
-            duree: article.duree, // Inclure la durée
-            typeArticleId: article.typeArticleId, // Assurez-vous que ce champ est inclus si nécessaire
-        }));
-    } catch (error) {
-        console.error(`Erreur lors de la récupération des articles pour le type ${typeId} :`, error);
-    }
+    const response = await fetch(`http://localhost:8080/api/articles/restaurant/${props.restaurantId}/type/${typeId}`);
+    const articles = await response.json();
+    articlesByType.value[typeId] = articles.map((article: any) => ({
+        id: article.id,
+        nom: article.nom,
+        description: article.description,
+        image: article.image,
+        prix: article.prix,
+        poids: article.poids,
+    }));
 };
 
-
-// Charger les données au montage du composant
 onMounted(async () => {
     await fetchTypeArticles();
     for (const type of typeArticles.value) {
@@ -210,24 +133,9 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.item-produit-by-type {
-    margin-top: 2rem;
-}
-
-.type-section {
-    margin-bottom: 3rem;
-}
-
-.type-title {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    text-align: center;
-    color: #333;
-}
-
 .articles-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Ajuste la largeur minimale des vignettes */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
 }
 
@@ -247,32 +155,18 @@ onMounted(async () => {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.article-image {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
+.add-to-cart-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
     border-radius: 4px;
-    margin-bottom: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
 }
 
-.article-name {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    color: #333;
-}
-
-.article-description {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 0.5rem;
-}
-
-.article-price,
-.article-weight {
-    font-size: 0.9rem;
-    color: #666;
-    margin: 0.2rem 0;
+.add-to-cart-button:hover {
+    background-color: #218838;
 }
 
 .modal-overlay {
@@ -286,7 +180,7 @@ onMounted(async () => {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    overflow: hidden; /* Empêche le défilement de la page en arrière-plan */
+    overflow: hidden;
 }
 
 .modal-content {
@@ -295,8 +189,8 @@ onMounted(async () => {
     border-radius: 8px;
     max-width: 500px;
     width: 90%;
-    max-height: 90%; /* Limite la hauteur du modal */
-    overflow-y: auto; /* Ajoute un défilement vertical si le contenu dépasse */
+    max-height: 90%;
+    overflow-y: auto;
     text-align: center;
     position: relative;
 }
@@ -342,75 +236,5 @@ onMounted(async () => {
 
 .close-button:hover {
     color: #000;
-}
-
-.edit-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 1rem;
-}
-
-.edit-button:hover {
-    background-color: #0056b3;
-}
-
-.cancel-button {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 1rem;
-}
-
-.cancel-button:hover {
-    background-color: #c82333;
-}
-
-.form-group {
-    margin-bottom: 1rem;
-    text-align: left;
-}
-
-.form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-    color: #333;
-}
-
-.form-input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-    color: #333;
-    box-sizing: border-box;
-}
-
-.form-input:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-.save-button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.save-button:hover {
-    background-color: #218838;
 }
 </style>
