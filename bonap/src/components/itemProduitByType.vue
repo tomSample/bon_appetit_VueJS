@@ -148,13 +148,10 @@ const updateArticle = async () => {
 
         alert('Article mis à jour avec succès');
 
-        // Mettre à jour les données localement
+        // Rafraîchir les articles pour refléter les modifications
         const typeId = selectedArticle.value.typeArticleId;
-        if (articlesByType.value[typeId]) {
-            const index = articlesByType.value[typeId].findIndex(article => article.id === selectedArticle.value.id);
-            if (index !== -1) {
-                articlesByType.value[typeId][index] = { ...selectedArticle.value };
-            }
+        if (typeId) {
+            await fetchArticlesByType(typeId); // Recharge les articles pour le type correspondant
         }
 
         // Fermer le modal
@@ -190,9 +187,12 @@ const fetchArticlesByType = async (typeId: number) => {
             id: article.id,
             nom: article.nom,
             description: article.description,
-            image: article.image,
+            image: article.image, // Inclure l'image
             prix: article.prix,
             poids: article.poids,
+            stock: article.stock, // Inclure le stock
+            duree: article.duree, // Inclure la durée
+            typeArticleId: article.typeArticleId, // Assurez-vous que ce champ est inclus si nécessaire
         }));
     } catch (error) {
         console.error(`Erreur lors de la récupération des articles pour le type ${typeId} :`, error);
