@@ -47,8 +47,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import itemRestaurant from '@/components/itemRestaurant.vue';
+
+// Récupération de la route et création d'une ref pour l'ID du restaurant
+const route = useRoute();
+const restaurantId = ref(null);
 
 const restaurant = ref({
     name: '',
@@ -66,6 +71,26 @@ const item = ref({
     price: '',
     description: '',
     image: null,
+    restaurantId: null,
+});
+
+// Fonction exécutée au chargement du composant
+onMounted(() => {
+    // Récupération de l'ID du restaurant depuis l'URL
+    if (route.params.restaurantId) {
+        restaurantId.value = route.params.restaurantId;
+    }
+    
+    if (restaurantId.value) {
+        console.log('ID du restaurant récupéré:', restaurantId.value);
+        // Assigner l'ID du restaurant à l'item
+        item.value.restaurantId = restaurantId.value;
+        
+        // Si nécessaire, vous pourriez également charger les données du restaurant
+        // fetchRestaurantData(restaurantId.value);
+    } else {
+        console.warn("Aucun ID de restaurant trouvé dans l'URL");
+    }
 });
 
 const handleFileUpload = (type, event) => {
@@ -77,10 +102,80 @@ const handleFileUpload = (type, event) => {
     }
 };
 
-const submitForm = () => {
-    // Handle form submission logic here
-    console.log('Restaurant:', restaurant.value);
-    console.log('Item:', item.value);
+const submitForm = async () => {
+    // Vérifier que nous avons un ID de restaurant
+    if (!item.value.restaurantId) {
+        console.error("Impossible de soumettre le formulaire: ID du restaurant manquant");
+        // Vous pourriez afficher un message d'erreur à l'utilisateur ici
+        return;
+    }
+    
+    // Préparation des données pour l'envoi
+    try {
+        const formData = new FormData();
+        
+        // Ajout des données de l'item au FormData
+        Object.keys(item.value).forEach(key => {
+            if (key === 'image' && item.value[key]) {
+                formData.append('itemImage', item.value[key]);
+            } else if (item.value[key] !== null) {
+                formData.append(key, item.value[key]);
+            }
+        });
+        
+        // Si vous soumettez également les données du restaurant
+        if (restaurant.value.name) {
+            Object.keys(restaurant.value).forEach(key => {
+                if (key === 'image' && restaurant.value[key]) {
+                    formData.append('restaurantImage', restaurant.value[key]);
+                } else if (restaurant.value[key] !== null) {
+                    formData.append('restaurant_' + key, restaurant.value[key]);
+                }
+            });
+        }
+        
+        console.log('Données à envoyer:', {
+            restaurant: restaurant.value,
+            item: item.value,
+            restaurantId: restaurantId.value
+        });
+        
+        // Envoi des données au serveur (à décommenter et adapter selon votre API)
+        /*
+        const response = await fetch('votre_url_api/items', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error('Erreur lors de l\'envoi des données');
+        }
+        
+        const result = await response.json();
+        console.log('Succès:', result);
+        // Réinitialiser le formulaire ou rediriger l'utilisateur
+        */
+        
+    } catch (error) {
+        console.error('Erreur lors de la soumission du formulaire:', error);
+    }
+};
+
+// Fonction pour charger les données du restaurant
+const fetchRestaurantData = async (id) => {
+    try {
+        const response = await fetch(`votre_url_api/restaurants/${id}`);
+        if (response.ok) {
+            const data = await response.json();
+            // Mettre à jour les données du restaurant (sans écraser l'image)
+            restaurant.value = {
+                ...data,
+                image: restaurant.value.image
+            };
+        }
+    } catch (error) {
+        console.error('Erreur lors du chargement des données du restaurant:', error);
+    }
 };
 </script>
 
