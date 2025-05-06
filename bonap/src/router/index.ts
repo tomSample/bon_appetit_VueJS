@@ -82,6 +82,11 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'owner' },
     },
     {
+      path: '/owner/restaurant/:restaurantId/item',
+      name: 'OwnerItem',
+      component: ItemsProduitsBy,
+    },
+    {
       path: '/owner/item',
       name: 'item-create',
       component: ItemsProduitsBy,
