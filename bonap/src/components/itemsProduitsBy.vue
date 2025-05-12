@@ -49,10 +49,12 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useArticleStore } from '@/stores/articleStore';
 import itemRestaurant from '@/components/itemRestaurant.vue';
 
 // Récupération de la route et création d'une ref pour l'ID du restaurant
 const route = useRoute();
+const articleStore = useArticleStore();
 const restaurantId = ref(null);
 
 const restaurant = ref({
@@ -79,12 +81,13 @@ onMounted(() => {
     // Récupération de l'ID du restaurant depuis l'URL
     if (route.params.restaurantId) {
         restaurantId.value = route.params.restaurantId;
+        articleStore.fetchArticles(Number(restaurantId.value));
     }
     
     if (restaurantId.value) {
         console.log('ID du restaurant récupéré:', restaurantId.value);
         // Assigner l'ID du restaurant à l'item
-        item.value.restaurantId = restaurantId.value;
+        item.value.restaurantId = Number(restaurantId.value);
         
         // Si nécessaire, vous pourriez également charger les données du restaurant
         // fetchRestaurantData(restaurantId.value);
@@ -114,7 +117,62 @@ const submitForm = async () => {
     try {
         const formData = new FormData();
         
-        // Ajout des données de l'item au FormData
+        // Préparer les données pour l'API Spring Boot
+       // const articleData = { >> Version antérieure au store
+        await articleStore.addArticle({
+            name: item.value.name,
+            type: item.value.type,
+            weight: item.value.weight,
+            preparationTime: item.value.preparationTime,
+            price: parseFloat(item.value.price),
+            description: item.value.description
+        });
+
+        // Conversion en JSON
+        const jsonData = JSON.stringify(articleStore);
+        
+        // Envoi des données au serveur
+        const response = await fetch(`/api/articles/restaurant/${item.value.restaurantId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: jsonData
+        });
+        
+        if (!response.ok) {
+            throw new Error('Erreur lors de l\'envoi des données');
+        }
+        
+        const result = await response.json();
+        console.log('Article créé avec succès:', result);
+        
+        // Gestion de l'image (si nécessaire)
+        if (item.value.image) {
+            const imageFormData = new FormData();
+            imageFormData.append('image', item.value.image);
+            
+            // Vous devrez probablement créer un endpoint séparé pour l'upload d'image
+            // await fetch(`/api/articles/${result.id}/upload-image`, {
+            //     method: 'POST',
+            //     body: imageFormData
+            // });
+        }
+        
+        // Réinitialiser le formulaire
+        item.value = {
+            name: '',
+            type: '',
+            weight: '',
+            preparationTime: '',
+            price: '',
+            description: '',
+            image: null,
+            restaurantId: item.value.restaurantId
+        };
+      
+        /* Version antérieure à priori inadéquate
+       // Ajout des données de l'item au FormData
         Object.keys(item.value).forEach(key => {
             if (key === 'image' && item.value[key]) {
                 formData.append('itemImage', item.value[key]);
@@ -138,7 +196,7 @@ const submitForm = async () => {
             restaurant: restaurant.value,
             item: item.value,
             restaurantId: restaurantId.value
-        });
+        }); */
         
         // Envoi des données au serveur (à décommenter et adapter selon votre API)
         /*
