@@ -66,12 +66,12 @@ const restaurant = ref({
 });
 
 const item = ref({
-    name: '',
-    type: '',
-    weight: '',
-    preparationTime: '',
-    price: '',
+    nom: '',
+    poids: '',
+    duree: '',
+    prix: '',
     description: '',
+    stock: '',
     image: null,
     restaurantId: null,
 });
@@ -117,16 +117,22 @@ const submitForm = async () => {
     try {
         const formData = new FormData();
         
-        // Préparer les données pour l'API Spring Boot
-       // const articleData = { >> Version antérieure au store
-        await articleStore.addArticle({
-            name: item.value.name,
-            type: item.value.type,
-            weight: item.value.weight,
-            preparationTime: item.value.preparationTime,
-            price: parseFloat(item.value.price),
-            description: item.value.description
-        });
+        // Préparer l'article sans l'ID du restaurant (car il est passé séparément)
+    const articleToSend = {
+      nom: item.value.nom,
+      prix: parseFloat(item.value.prix),
+      description: item.value.description,
+      poids: parseInt(item.value.poids),
+      stock: parseInt(item.value.stock),
+      duree: parseInt(item.value.duree),
+      // L'image sera gérée séparément si nécessaire
+    };
+
+          // Passer l'article et l'ID du restaurant séparément
+    await articleStore.addArticle(
+      articleToSend, 
+      Number(item.value.restaurantId)
+    );
 
         // Conversion en JSON
         const jsonData = JSON.stringify(articleStore);
@@ -161,13 +167,13 @@ const submitForm = async () => {
         
         // Réinitialiser le formulaire
         item.value = {
-            name: '',
-            type: '',
-            weight: '',
-            preparationTime: '',
-            price: '',
+            nom: '',
+            prix: '',
             description: '',
             image: null,
+            poids: '',
+            stock: '',
+            duree: '',
             restaurantId: item.value.restaurantId
         };
       
@@ -214,9 +220,12 @@ const submitForm = async () => {
         // Réinitialiser le formulaire ou rediriger l'utilisateur
         */
         
-    } catch (error) {
-        console.error('Erreur lors de la soumission du formulaire:', error);
-    }
+    alert('Article ajouté avec succès !');
+    
+  } catch (error) {
+    console.error('Erreur lors de la soumission du formulaire:', error);
+    alert('Erreur lors de l\'ajout de l\'article');
+  }
 };
 
 // Fonction pour charger les données du restaurant
