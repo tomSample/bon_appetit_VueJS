@@ -1,6 +1,17 @@
 {
+  "name": "bon-appetit-vuejs",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
   "dependencies": {
     "pinia": "^3.0.2",
+    "vue": "^3.4.0",
     "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
   }
 }
