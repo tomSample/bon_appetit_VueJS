@@ -18,6 +18,22 @@
             <div v-else>
                 <p>Aucune adresse enregistrée.</p>
             </div>
+            <form @submit.prevent="ajouterAdresse">
+                <input v-model="nouvelleAdresse.numero" placeholder="Numéro" required />
+                <input v-model="nouvelleAdresse.rue" placeholder="Rue" required />
+                <input v-model="nouvelleAdresse.complement" placeholder="Complément" />
+                <input v-model="nouvelleAdresse.codePostal" placeholder="Code postal" required />
+                <input v-model="nouvelleAdresse.ville" placeholder="Ville" required />
+                <label>
+                    <input type="checkbox" v-model="nouvelleAdresse.adresseParDefaut" />
+                    Domicile
+                </label>
+                <label>
+                    <input type="checkbox" v-model="nouvelleAdresse.adresseTravail" />
+                    Travail
+                </label>
+                <button type="submit">Ajouter</button>
+            </form>
         </div>
     </section>
 </template>
@@ -27,8 +43,36 @@ import { ref, onMounted } from 'vue';
 
 const adresses = ref([]);
 
-// À adapter selon la façon dont tu récupères l'id utilisateur
 const userId = localStorage.getItem('userId');
+
+const nouvelleAdresse = ref({
+    numero: '',
+    rue: '',
+    complement: '',
+    codePostal: '',
+    ville: '',
+    adresseParDefaut: false,
+    adresseTravail: false
+});
+
+const ajouterAdresse = async () => {
+    try {
+        const response = await fetch(`http://localhost:8080/api/utilisateurs/${userId}/adresses`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nouvelleAdresse.value)
+        });
+        if (response.ok) {
+            await fetchAdresses();
+            // Réinitialiser le formulaire
+            Object.keys(nouvelleAdresse.value).forEach(k => nouvelleAdresse.value[k] = (typeof nouvelleAdresse.value[k] === 'boolean' ? false : ''));
+        } else {
+            alert('Erreur lors de l\'ajout');
+        }
+    } catch (e) {
+        alert('Erreur lors de l\'ajout');
+    }
+};
 
 const fetchAdresses = async () => {
     try {
