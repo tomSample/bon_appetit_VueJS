@@ -57,6 +57,17 @@ et envoie ces données à l'API pour créer un nouvel utilisateur.
                         <label for="codePostal">Postal Code:</label>
                         <input type="text" id="codePostal" v-model="signUpData.codePostal" required />
                     </div>
+                    <div class="form-group">
+                        <label>Type d'adresse :</label>
+                        <label>
+                            <input type="radio" value="domicile" v-model="signUpData.typeAdresse" checked />
+                            Domicile
+                        </label>
+                        <label>
+                            <input type="radio" value="travail" v-model="signUpData.typeAdresse" />
+                            Travail
+                        </label>
+                    </div>
                 </div>
             </div>
             <input type="hidden" v-model="signUpData.role_id" />
@@ -84,7 +95,8 @@ const signUpData = ref({
     complement: '',
     ville: '',
     codePostal: '',
-    role_id: null
+    role_id: null,
+    typeAdresse: 'domicile'
 });
 
 const message = ref('');
