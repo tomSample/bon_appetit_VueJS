@@ -1,0 +1,76 @@
+src
+├── App.vue
+├── assets
+│   ├── logo.svg
+│   └── main.css
+├── components
+│   ├── adresseDetailsForm.vue
+│   ├── carroussel.vue
+│   ├── chartTable.vue
+│   ├── clientTable.vue
+│   ├── foot.vue
+│   ├── heroSearch.vue
+│   ├── icons
+│   │   ├── IconCommunity.vue
+│   │   ├── IconDocumentation.vue
+│   │   ├── IconEcosystem.vue
+│   │   ├── IconSupport.vue
+│   │   └── IconTooling.vue
+│   ├── itemProduitByType.vue
+│   ├── itemRestaurant.vue
+│   ├── itemsProduitsBy.vue
+│   ├── navBar.vue
+│   ├── ownerCreateArticle.vue
+│   ├── reservationForm.vue
+│   ├── restaurantDetailsForm.vue
+│   ├── restaurantTable.vue
+│   └── villeDetailsForm.vue
+├── img
+│   └── icon
+│       ├── add.png
+│       ├── afternoon-tea.png
+│       ├── arrow.png
+│       ├── burger-sandwich.png
+│       ├── churros.png
+│       ├── close.png
+│       ├── cutlery.png
+│       ├── delete.png
+│       ├── editing.png
+│       ├── falafel.png
+│       ├── food.png
+│       ├── hot-dog.png
+│       ├── order.png
+│       ├── pizza.png
+│       ├── poke.png
+│       ├── poutine.png
+│       ├── pretzel.png
+│       ├── ramen.png
+│       ├── satay.png
+│       ├── spaghetti.png
+│       ├── sushi.png
+│       ├── tacos.png
+│       └── upload.png
+├── main.ts
+├── router
+│   └── index.ts
+├── services
+│   └── restaurantApi.js
+├── stores
+│   ├── articleStore.ts
+│   ├── auth.ts
+│   ├── Frontend tree.txt
+│   └── index.ts
+└── views
+    ├── About.vue
+    ├── Checkout.vue
+    ├── ConditionsGenerales.vue
+    ├── Home.vue
+    ├── ItemsProduitsBy.vue
+    ├── Login.vue
+    ├── Mentions.vue
+    ├── MyAccount.vue
+    ├── OwnerCreateRestaurant.vue
+    ├── OwnerDashboard.vue
+    ├── ResetCo.vue
+    ├── Restaurant.vue
+    └── SignUp.vue

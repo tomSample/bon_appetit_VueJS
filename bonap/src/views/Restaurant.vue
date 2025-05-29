@@ -1,6 +1,6 @@
-<!-- 
+<!--
 Restaurant.vue :
-Cette vue affiche les détails d'un restaurant sélectionné, y compris son nom, sa description, 
+Cette vue affiche les détails d'un restaurant sélectionné, y compris son nom, sa description,
 et les plats proposés. Elle inclut également un formulaire de réservation.
 -->
 <template>
@@ -10,51 +10,57 @@ et les plats proposés. Elle inclut également un formulaire de réservation.
         <h2>{{ restaurant.nom }}</h2>
         <p>{{ restaurant.description }}</p>
         <p>Ceci est la page du restaurant qui doit afficher les plats proposés</p>
-
         <!-- Afficher le formulaire de réservation -->
         <reservationForm />
-
         <!-- Afficher les plats proposés par le restaurant -->
         <itemProduitByType />
-
+    </div>
+    <div v-else-if="loading">
+        <p>Loading...</p>
     </div>
     <div v-else>
-        <p>Loading...</p>
+        <p>Erreur : Restaurant non trouvé</p>
     </div>
 </template>
 
-
 <script setup lang="ts">
-// Import des composants (ref = reactive)
+// Import des composants et services
 import { ref, onMounted } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import reservationForm from '@/components/reservationForm.vue';
+import itemProduitByType from '@/components/itemProduitByType.vue'; // Import ajouté
+import { fetchRestaurantById } from '@/services/restaurantApi.js';
 
 const route = useRoute();
-const restaurantId = route.params.id;
 const restaurant = ref(null);
+const loading = ref(true);
 
-// Fonction pour récupérer les détails du restaurant depuis l'API
-const fetchRestaurantDetails = async (id: number) => {
-    try {
-        // Interroge l'API pour récupérer les détails du restaurant
-        const response = await fetch(`http://localhost:8080/api/restaurants/${id}`);
-        // Si la réponse n'est pas ok, on lance une erreur
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        // Sinon on récupère les données de la réponse au format json
-        const data = await response.json();
-        // Affecter les données récupérées (data) à la variable restaurant
-        restaurant.value = data;
-    } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
-    }
-};
-
-// Appeler la fonction fetchRestaurantDetails lors du montage du composant
+// Appeler la fonction lors du montage du composant
 onMounted(async () => {
-    // Convertir le paramètre id en nombre entier et appeler fetchRestaurantDetails
-    await fetchRestaurantDetails(parseInt(restaurantId));
+    try {
+        // Debug : vérifier la valeur du paramètre
+        console.log('Restaurant ID from route:', route.params.restaurantId);
+        console.log('Full route params:', route.params);
+       
+        const restaurantId = parseInt(route.params.restaurantId as string);
+       
+        // Vérifier que l'ID est valide
+        if (isNaN(restaurantId)) {
+            console.error('Route params:', route.params);
+            throw new Error('ID restaurant invalide');
+        }
+       
+        // Utiliser le service API
+        const data = await fetchRestaurantById(restaurantId);
+        restaurant.value = data;
+       
+        console.log('Restaurant loaded:', data);
+       
+    } catch (error) {
+        console.error('Erreur lors du chargement du restaurant:', error);
+        console.error('Current route:', route);
+    } finally {
+        loading.value = false;
+    }
 });
 </script>
